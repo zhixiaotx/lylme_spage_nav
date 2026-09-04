@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowUp, Sun, Moon, Settings, Wallpaper, Database } from 'lucide-react';
+import { ThemeConfig } from '../types';
 
 interface FloatingActionsProps {
   isDarkMode: boolean;
+  theme: ThemeConfig;
   onToggleThemeMode: () => void;
   onOpenSettings: () => void;
   onOpenWallpaper?: () => void;
@@ -12,6 +14,7 @@ interface FloatingActionsProps {
 
 export const FloatingActions: React.FC<FloatingActionsProps> = ({
   isDarkMode,
+  theme,
   onToggleThemeMode,
   onOpenSettings,
   onOpenWallpaper,
@@ -36,6 +39,17 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
     });
   };
 
+  const opacityVal = typeof theme?.opacity === 'number' ? theme.opacity : 0.85;
+  const blurVal = typeof theme?.blur === 'number' ? theme.blur : 12;
+
+  const floatingButtonStyle: React.CSSProperties = {
+    backgroundColor: isDarkMode
+      ? `rgba(15, 23, 42, ${opacityVal})`
+      : `rgba(255, 255, 255, ${opacityVal})`,
+    backdropFilter: `blur(${blurVal}px)`,
+    WebkitBackdropFilter: `blur(${blurVal}px)`,
+  };
+
   return (
     <div
       id="floating-actions-container"
@@ -57,10 +71,11 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
               whileTap={{ scale: 0.88 }}
               onClick={scrollToTop}
               aria-label="一键返回顶部"
-              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
+              style={floatingButtonStyle}
+              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-transparent ${
                 isDarkMode
-                  ? 'bg-slate-900/80 border-white/20 text-white/90 hover:text-white hover:bg-slate-800'
-                  : 'bg-white/85 border-slate-200/90 text-slate-700 hover:text-slate-950 hover:bg-white shadow-slate-300/50'
+                  ? 'text-white/90 hover:text-white hover:bg-slate-800/80'
+                  : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100/80 shadow-slate-300/50'
               }`}
             >
               <ArrowUp size={20} className="stroke-[2.5]" />
@@ -80,10 +95,11 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
           whileTap={{ scale: 0.88 }}
           onClick={onToggleThemeMode}
           aria-label={isDarkMode ? '切换为白天明亮模式' : '切换为黑夜深色模式'}
-          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
+          style={floatingButtonStyle}
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-transparent ${
             isDarkMode
-              ? 'bg-slate-900/80 border-white/20 text-amber-300 hover:text-amber-200 hover:bg-slate-800'
-              : 'bg-white/85 border-slate-200/90 text-sky-600 hover:text-sky-800 hover:bg-white shadow-slate-300/50'
+              ? 'text-amber-300 hover:text-amber-200 hover:bg-slate-800/80'
+              : 'text-sky-600 hover:text-sky-800 hover:bg-slate-100/80 shadow-slate-300/50'
           }`}
         >
           <AnimatePresence mode="wait">
@@ -124,10 +140,11 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
             whileTap={{ scale: 0.88 }}
             onClick={onOpenWallpaper}
             aria-label="打开壁纸中心"
-            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
+            style={floatingButtonStyle}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-transparent ${
               isDarkMode
-                ? 'bg-slate-900/80 border-white/20 text-sky-400 hover:text-sky-300 hover:bg-slate-800'
-                : 'bg-white/85 border-slate-200/90 text-indigo-600 hover:text-indigo-800 hover:bg-white shadow-slate-300/50'
+                ? 'text-sky-400 hover:text-sky-300 hover:bg-slate-800/80'
+                : 'text-indigo-600 hover:text-indigo-800 hover:bg-slate-100/80 shadow-slate-300/50'
             }`}
           >
             <Wallpaper size={20} />
@@ -147,10 +164,11 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
             whileTap={{ scale: 0.88 }}
             onClick={onOpenBackup}
             aria-label="打开数据管理中心"
-            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
+            style={floatingButtonStyle}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-transparent ${
               isDarkMode
-                ? 'bg-slate-900/80 border-white/20 text-emerald-400 hover:text-emerald-300 hover:bg-slate-800'
-                : 'bg-white/85 border-slate-200/90 text-emerald-600 hover:text-emerald-800 hover:bg-white shadow-slate-300/50'
+                ? 'text-emerald-400 hover:text-emerald-300 hover:bg-slate-800/80'
+                : 'text-emerald-600 hover:text-emerald-800 hover:bg-slate-100/80 shadow-slate-300/50'
             }`}
           >
             <Database size={20} />
@@ -169,10 +187,11 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
           whileTap={{ scale: 0.88 }}
           onClick={onOpenSettings}
           aria-label="打开系统设置"
-          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
+          style={floatingButtonStyle}
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-transparent ${
             isDarkMode
-              ? 'bg-slate-900/80 border-white/20 text-slate-300 hover:text-white hover:bg-slate-800'
-              : 'bg-white/85 border-slate-200/90 text-slate-700 hover:text-slate-950 hover:bg-white shadow-slate-300/50'
+              ? 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+              : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100/80 shadow-slate-300/50'
           }`}
         >
           <Settings size={20} />

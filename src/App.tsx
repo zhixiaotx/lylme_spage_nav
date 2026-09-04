@@ -615,11 +615,7 @@ export default function App() {
               ? currentThemeMeta.cardBgClass
               : 'bg-white/85 backdrop-blur-xl shadow-sm hover:shadow-md'
           }
-          cardBorderClass={
-            isDark
-              ? currentThemeMeta.cardBorderClass
-              : 'border-slate-200/90 hover:border-slate-300'
-          }
+          cardBorderClass="border-transparent"
           textClass={isDark ? currentThemeMeta.textClass : 'text-slate-900 font-bold'}
           subtextClass={isDark ? currentThemeMeta.subtextClass : 'text-slate-600'}
         />
@@ -686,8 +682,10 @@ export default function App() {
       {/* Floating Actions: Back to top, Day/Night mode toggle, Settings trigger */}
       <FloatingActions
         isDarkMode={isDark}
+        theme={config.theme}
         onToggleThemeMode={handleToggleThemeMode}
         onOpenSettings={() => handleOpenSettings('theme')}
+        onOpenWallpaper={() => handleOpenSettings('wallpaper')}
         onOpenBackup={() => handleOpenSettings('backup')}
       />
     </div>

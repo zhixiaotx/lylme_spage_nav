@@ -150,11 +150,18 @@ export function SearchBar({
       {/* Main Search Input Form */}
       <form
         onSubmit={handleSubmit}
-        className={`relative flex items-center rounded-full px-5 py-3.5 shadow-xl border transition-all duration-300 ${
+        style={{
+          backgroundColor: isDarkMode
+            ? `rgba(15, 23, 42, ${typeof theme?.opacity === 'number' ? theme.opacity : 0.85})`
+            : `rgba(255, 255, 255, ${typeof theme?.opacity === 'number' ? theme.opacity : 0.85})`,
+          backdropFilter: `blur(${typeof theme?.blur === 'number' ? theme.blur : 12}px)`,
+          WebkitBackdropFilter: `blur(${typeof theme?.blur === 'number' ? theme.blur : 12}px)`,
+        }}
+        className={`relative flex items-center rounded-full px-5 py-3.5 shadow-xl border border-transparent transition-all duration-300 ${
           isDarkMode
-            ? 'bg-slate-900/60 backdrop-blur-xl border-white/20 focus-within:border-sky-400/80 focus-within:bg-slate-900/80'
-            : 'bg-white/85 backdrop-blur-xl border-slate-200/90 shadow-slate-200/60 focus-within:border-sky-500 focus-within:bg-white'
-        } ${matchedBookmarks.length > 0 ? 'rounded-b-none border-b-transparent' : ''}`}
+            ? 'shadow-black/20'
+            : 'shadow-slate-200/60'
+        } ${matchedBookmarks.length > 0 ? 'rounded-b-none' : ''}`}
       >
         {/* Engine Switcher Trigger */}
         <div id="search-engine-selector" className="relative">

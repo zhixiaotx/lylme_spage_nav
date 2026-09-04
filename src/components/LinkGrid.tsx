@@ -108,11 +108,19 @@ export function LinkGrid({
     (isDarkMode
       ? 'bg-slate-900/60 backdrop-blur-xl'
       : 'bg-white/85 backdrop-blur-xl shadow-sm hover:shadow-md');
-  const resolvedCardBorderClass =
-    cardBorderClass ||
-    (isDarkMode
-      ? 'border-white/15 hover:border-white/40'
-      : 'border-slate-200/90 hover:border-slate-300');
+  const resolvedCardBorderClass = cardBorderClass || 'border-transparent';
+
+  // Compute dynamic card style respecting theme opacity and blur settings
+  const opacityVal = typeof theme?.opacity === 'number' ? theme.opacity : 0.85;
+  const blurVal = typeof theme?.blur === 'number' ? theme.blur : 12;
+
+  const dynamicCardStyle: React.CSSProperties = useMemo(() => ({
+    backgroundColor: isDarkMode
+      ? `rgba(15, 23, 42, ${opacityVal})`
+      : `rgba(255, 255, 255, ${opacityVal})`,
+    backdropFilter: `blur(${blurVal}px)`,
+    WebkitBackdropFilter: `blur(${blurVal}px)`,
+  }), [opacityVal, blurVal, isDarkMode]);
 
   const toggleGroupCollapse = (groupId: string) => {
     setCollapsedGroups((prev) => {
@@ -339,13 +347,16 @@ export function LinkGrid({
           </div>
 
           {/* Sidebar Category List */}
-          <div className={`lg:col-span-1 lg:sticky top-8 rounded-2xl p-4 border shadow-xl space-y-2 backdrop-blur-2xl ${
-            isMobileSidebarOpen ? 'block' : 'hidden lg:block'
-          } ${
-            isDarkMode
-              ? 'bg-white/10 border-white/20 text-white'
-              : 'bg-white/85 border-slate-200 text-slate-800'
-          }`}>
+          <div
+            style={dynamicCardStyle}
+            className={`lg:col-span-1 lg:sticky top-8 rounded-2xl p-4 shadow-xl space-y-2 ${
+              isMobileSidebarOpen ? 'block' : 'hidden lg:block'
+            } ${
+              isDarkMode
+                ? 'text-white'
+                : 'text-slate-800'
+            }`}
+          >
             <h3 className={`text-xs font-bold uppercase tracking-wider px-3 py-1 ${resolvedSubtextClass}`}>
               快捷分类索引
             </h3>
@@ -808,6 +819,9 @@ const SortableNavCard = memo(function SortableNavCard({
     touchAction: editMode ? 'none' : undefined,
   };
 
+  const cardOpacity = typeof theme.opacity === 'number' ? theme.opacity : 0.85;
+  const cardBlur = typeof theme.blur === 'number' ? theme.blur : 12;
+
   return (
     <div
       ref={setNodeRef}
@@ -822,13 +836,17 @@ const SortableNavCard = memo(function SortableNavCard({
         rel="noopener noreferrer"
         whileHover={{ scale: editMode ? 1.01 : 1.03, y: editMode ? 0 : -3 }}
         whileTap={{ scale: editMode ? 0.99 : 0.98 }}
-        className={`relative flex items-center gap-3 p-3 sm:gap-3.5 sm:p-3.5 ${radiusClass} ${cardBgClass} border ${cardBorderClass} shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden select-none ${
+        className={`relative flex items-center gap-3 p-3 sm:gap-3.5 sm:p-3.5 ${radiusClass} border ${cardBorderClass} shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden select-none ${
           editMode
             ? 'cursor-grab active:cursor-grabbing hover:border-sky-400/50'
             : 'cursor-pointer'
         }`}
         style={{
-          backdropFilter: `blur(${theme.blur}px)`,
+          backgroundColor: isDarkMode
+            ? `rgba(15, 23, 42, ${cardOpacity})`
+            : `rgba(255, 255, 255, ${cardOpacity})`,
+          backdropFilter: `blur(${cardBlur}px)`,
+          WebkitBackdropFilter: `blur(${cardBlur}px)`,
         }}
         {...(editMode ? { ...attributes, ...listeners } : {})}
       >
@@ -957,6 +975,8 @@ const QuickPinnedCard = memo(function QuickPinnedCard({
   onDelete: () => void;
 }) {
   const subtextClass = isDarkMode ? 'text-slate-300' : 'text-slate-600';
+  const cardOpacity = typeof theme.opacity === 'number' ? theme.opacity : 0.85;
+  const cardBlur = typeof theme.blur === 'number' ? theme.blur : 12;
 
   return (
     <div className="relative group">
@@ -965,7 +985,14 @@ const QuickPinnedCard = memo(function QuickPinnedCard({
         target={theme.openInNewTab ? '_blank' : '_self'}
         rel="noopener noreferrer"
         whileHover={{ scale: 1.05, y: -2 }}
-        className={`flex items-center gap-2.5 p-2.5 ${radiusClass} ${cardBgClass} border ${cardBorderClass} shadow-sm hover:shadow-md transition-all truncate`}
+        className={`flex items-center gap-2.5 p-2.5 ${radiusClass} border ${cardBorderClass} shadow-sm hover:shadow-md transition-all truncate`}
+        style={{
+          backgroundColor: isDarkMode
+            ? `rgba(15, 23, 42, ${cardOpacity})`
+            : `rgba(255, 255, 255, ${cardOpacity})`,
+          backdropFilter: `blur(${cardBlur}px)`,
+          WebkitBackdropFilter: `blur(${cardBlur}px)`,
+        }}
       >
         <div className="w-5 h-5 flex items-center justify-center shrink-0">
           <Favicon
