@@ -8,6 +8,7 @@ import { LinkGrid } from './components/LinkGrid';
 import { LinkEditorModal } from './components/LinkEditorModal';
 import { SettingsPanel } from './components/SettingsPanel';
 import { FloatingActions } from './components/FloatingActions';
+import { MusicPlayerLoader } from './components/MusicPlayerLoader';
 import {
   Settings,
   Edit3,
@@ -688,6 +689,9 @@ export default function App() {
         onOpenWallpaper={() => handleOpenSettings('wallpaper')}
         onOpenBackup={() => handleOpenSettings('backup')}
       />
+
+      {/* Music Player Loader (handles safe initialization and single-instance locks) */}
+      <MusicPlayerLoader />
     </div>
   );
 }
