@@ -1,0 +1,6 @@
+{
+  "name": "六零导航页 - LyLme Spage",
+  "description": "基于 LyLme Spage 与 LyLme-Spage-Palette 二次开发的现代化高颜值无服务器导航起始页，支持多级分类、HTML书签迁移与云端实时自动同步。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
