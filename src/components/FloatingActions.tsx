@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowUp, Sun, Moon, Settings, Wallpaper } from 'lucide-react';
+import { ArrowUp, Sun, Moon, Settings, Wallpaper, Database } from 'lucide-react';
 
 interface FloatingActionsProps {
   isDarkMode: boolean;
   onToggleThemeMode: () => void;
   onOpenSettings: () => void;
   onOpenWallpaper?: () => void;
+  onOpenBackup?: () => void;
 }
 
 export const FloatingActions: React.FC<FloatingActionsProps> = ({
@@ -14,6 +15,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
   onToggleThemeMode,
   onOpenSettings,
   onOpenWallpaper,
+  onOpenBackup,
 }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -37,7 +39,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
   return (
     <div
       id="floating-actions-container"
-      className="fixed right-3.5 bottom-4 sm:right-6 sm:bottom-6 z-50 flex flex-col items-end gap-2.5 sm:gap-3.5 select-none pointer-events-none pb-[env(safe-area-inset-bottom,0px)] pr-[env(safe-area-inset-right,0px)]"
+      className="fixed right-3.5 bottom-5 sm:right-6 sm:bottom-6 z-50 flex flex-col items-end gap-3.5 sm:gap-4 select-none pointer-events-none pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pr-[env(safe-area-inset-right,0px)]"
     >
       {/* Scroll to Top Button */}
       <AnimatePresence>
@@ -51,17 +53,17 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
               initial={{ opacity: 0, scale: 0.7, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.7, y: 10 }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.88 }}
               onClick={scrollToTop}
               aria-label="一键返回顶部"
-              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border backdrop-blur-xl transition-all duration-300 ${
+              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
                 isDarkMode
-                  ? 'bg-slate-900/85 hover:bg-slate-800 text-white border-white/20 shadow-black/40'
-                  : 'bg-white/95 hover:bg-white text-slate-800 border-slate-200 shadow-slate-300/50'
+                  ? 'bg-slate-900/80 border-white/20 text-white/90 hover:text-white hover:bg-slate-800'
+                  : 'bg-white/85 border-slate-200/90 text-slate-700 hover:text-slate-950 hover:bg-white shadow-slate-300/50'
               }`}
             >
-              <ArrowUp size={19} className="stroke-[2.5]" />
+              <ArrowUp size={20} className="stroke-[2.5]" />
             </motion.button>
           </div>
         )}
@@ -74,14 +76,14 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
         </span>
         <motion.button
           type="button"
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.88 }}
           onClick={onToggleThemeMode}
           aria-label={isDarkMode ? '切换为白天明亮模式' : '切换为黑夜深色模式'}
-          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border backdrop-blur-xl transition-all duration-300 ${
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
             isDarkMode
-              ? 'bg-slate-900/85 hover:bg-slate-800 text-amber-300 border-white/20 shadow-black/40 ring-1 ring-amber-400/20'
-              : 'bg-white/95 hover:bg-white text-sky-600 border-slate-200 shadow-slate-300/50 ring-1 ring-sky-500/10'
+              ? 'bg-slate-900/80 border-white/20 text-amber-300 hover:text-amber-200 hover:bg-slate-800'
+              : 'bg-white/85 border-slate-200/90 text-sky-600 hover:text-sky-800 hover:bg-white shadow-slate-300/50'
           }`}
         >
           <AnimatePresence mode="wait">
@@ -93,7 +95,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
                 exit={{ rotate: 90, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Sun size={19} />
+                <Sun size={20} />
               </motion.div>
             ) : (
               <motion.div
@@ -103,7 +105,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
                 exit={{ rotate: -90, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Moon size={19} />
+                <Moon size={20} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -118,17 +120,40 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
           </span>
           <motion.button
             type="button"
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.94 }}
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.88 }}
             onClick={onOpenWallpaper}
             aria-label="打开壁纸中心"
-            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border backdrop-blur-xl transition-all duration-300 ${
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
               isDarkMode
-                ? 'bg-slate-900/85 hover:bg-slate-800 text-sky-400 border-white/20 shadow-black/40'
-                : 'bg-white/95 hover:bg-white text-indigo-600 border-slate-200 shadow-slate-300/50'
+                ? 'bg-slate-900/80 border-white/20 text-sky-400 hover:text-sky-300 hover:bg-slate-800'
+                : 'bg-white/85 border-slate-200/90 text-indigo-600 hover:text-indigo-800 hover:bg-white shadow-slate-300/50'
             }`}
           >
-            <Wallpaper size={19} />
+            <Wallpaper size={20} />
+          </motion.button>
+        </div>
+      )}
+
+      {/* Quick Data Backup & Import/Export Button */}
+      {onOpenBackup && (
+        <div className="group relative flex items-center pointer-events-auto">
+          <span className="hidden sm:block absolute right-full mr-2.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-900/90 text-white dark:bg-white/90 dark:text-slate-900 shadow-md backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+            数据管理 (HTML/JSON导入导出)
+          </span>
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.88 }}
+            onClick={onOpenBackup}
+            aria-label="打开数据管理中心"
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
+              isDarkMode
+                ? 'bg-slate-900/80 border-white/20 text-emerald-400 hover:text-emerald-300 hover:bg-slate-800'
+                : 'bg-white/85 border-slate-200/90 text-emerald-600 hover:text-emerald-800 hover:bg-white shadow-slate-300/50'
+            }`}
+          >
+            <Database size={20} />
           </motion.button>
         </div>
       )}
@@ -140,17 +165,17 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
         </span>
         <motion.button
           type="button"
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.88 }}
           onClick={onOpenSettings}
           aria-label="打开系统设置"
-          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border backdrop-blur-xl transition-all duration-300 ${
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-xl border ${
             isDarkMode
-              ? 'bg-slate-900/85 hover:bg-slate-800 text-slate-300 hover:text-white border-white/20 shadow-black/40'
-              : 'bg-white/95 hover:bg-white text-slate-700 hover:text-slate-950 border-slate-200 shadow-slate-300/50'
+              ? 'bg-slate-900/80 border-white/20 text-slate-300 hover:text-white hover:bg-slate-800'
+              : 'bg-white/85 border-slate-200/90 text-slate-700 hover:text-slate-950 hover:bg-white shadow-slate-300/50'
           }`}
         >
-          <Settings size={19} />
+          <Settings size={20} />
         </motion.button>
       </div>
     </div>

@@ -68,7 +68,7 @@ export interface NavGroup {
 
 // Theme Presets: LyLme Original Themes + LyLme-Spage-Palette Themes
 export type ThemePreset =
-  // 1. 原项目 LyLme Spage 官方原生主题 (Original Templates)
+  // 1. 原项目 LyLme Spage Nav 官方原生主题 (Original Templates)
   | 'lylme-default'      // 六零官方原生默认主题 (default)
   | 'lylme-baisu'        // 白粟极简主题 (baisu)
   | 'lylme-baisuTwo'     // 白粟二代精简主题 (baisuTwo)

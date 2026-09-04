@@ -18,6 +18,7 @@ import {
   Loader2,
   Compass,
   Plus,
+  Database,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -25,6 +26,14 @@ export default function App() {
   const [config, setConfig] = useState<AppConfig>(loadConfig);
   const [editMode, setEditMode] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<
+    'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup'
+  >('theme');
+
+  const handleOpenSettings = (tab?: 'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup') => {
+    setSettingsTab(tab || 'theme');
+    setSettingsOpen(true);
+  };
 
   // Link / Group editor modal state
   const [editorModalOpen, setEditorModalOpen] = useState(false);
@@ -158,9 +167,10 @@ export default function App() {
         config.theme.preset === 'lylme-dark'
   );
 
-  // Synchronize 'dark' class and meta theme-color on <html> document element in real time
+  // Synchronize 'dark' class, body background, and meta theme-color on <html> document element in real time
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     let metaThemeColor = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
     if (!metaThemeColor) {
       metaThemeColor = document.createElement('meta');
@@ -168,16 +178,33 @@ export default function App() {
       document.head.appendChild(metaThemeColor);
     }
 
+    let themeBg = '#0b0f19';
+    if (isDark) {
+      themeBg = '#09090b';
+    } else if (config.theme.preset === 'lylme-default') {
+      themeBg = '#eef2f6';
+    } else if (config.theme.preset === 'lylme-baisuTwo') {
+      themeBg = '#fdfbfb';
+    } else if (config.theme.preset === 'lylme-baisu' || config.theme.preset === 'palette-pure') {
+      themeBg = '#f8fafc';
+    } else {
+      themeBg = '#0f172a';
+    }
+
     if (isDark) {
       root.classList.add('dark');
+      root.classList.remove('light');
       root.style.colorScheme = 'dark';
-      metaThemeColor.content = '#0b0f19';
     } else {
       root.classList.remove('dark');
+      root.classList.add('light');
       root.style.colorScheme = 'light';
-      metaThemeColor.content = '#f8fafc';
     }
-  }, [isDark]);
+
+    metaThemeColor.content = themeBg;
+    root.style.backgroundColor = themeBg;
+    body.style.backgroundColor = themeBg;
+  }, [isDark, config.theme.preset]);
 
   const handleToggleThemeMode = () => {
     const nextIsDark = !isDark;
@@ -271,6 +298,16 @@ export default function App() {
     const updatedGroups = config.groups.map((g) => {
       if (g.id === groupId) {
         return { ...g, items: g.items.filter((it) => it.id !== itemId) };
+      }
+      return g;
+    });
+    handleConfigUpdate({ ...config, groups: updatedGroups });
+  };
+
+  const handleReorderLinks = (groupId: string, newItems: NavItem[]) => {
+    const updatedGroups = config.groups.map((g) => {
+      if (g.id === groupId) {
+        return { ...g, items: newItems };
       }
       return g;
     });
@@ -377,10 +414,13 @@ export default function App() {
   const bgBlur = config.theme.wallpaperBlur ?? 0;
 
   return (
-    <div
-      className="min-h-screen relative flex flex-col transition-colors duration-700 font-sans"
-      style={backgroundStyle}
-    >
+    <div className="min-h-screen relative flex flex-col transition-colors duration-700 font-sans">
+      {/* Fixed Fullscreen Background Layer */}
+      <div
+        className="fixed inset-0 pointer-events-none transition-all duration-700 z-0"
+        style={backgroundStyle}
+      />
+
       {/* Dynamic Custom CSS injection */}
       {config.theme.customCss && (
         <style dangerouslySetInnerHTML={{ __html: config.theme.customCss }} />
@@ -394,7 +434,7 @@ export default function App() {
             config.theme.preset === 'palette-pure' || config.theme.preset === 'lylme-baisu'
               ? 'transparent'
               : !isDark
-              ? `rgba(255, 255, 255, ${Math.min(0.4, Math.max(0.12, maskOpacity * 0.6))})`
+              ? `rgba(15, 23, 42, ${Math.min(0.2, Math.max(0.05, maskOpacity * 0.3))})`
               : `rgba(0, 0, 0, ${maskOpacity})`,
           backdropFilter: bgBlur > 0 || config.theme.blur > 0 ? `blur(${bgBlur + config.theme.blur}px)` : undefined,
         }}
@@ -404,87 +444,84 @@ export default function App() {
       <header className="relative z-40 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-3 flex items-center justify-between">
         {/* Logo & Title */}
         <div className="flex items-center gap-2.5 select-none">
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-md border backdrop-blur-md ${
-            isDark
-              ? 'bg-white/20 border-white/20 text-white'
-              : 'bg-white/80 border-slate-200 text-sky-600 shadow-slate-200/80'
-          }`}>
-            <Compass size={20} className={isDark ? 'text-white' : 'text-sky-600'} />
+          <div className="w-8 h-8 flex items-center justify-center">
+            <Compass size={22} className={isDark ? 'text-white' : 'text-sky-600'} />
           </div>
           <div>
             <h1 className={`text-base font-extrabold tracking-tight leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>
               {config.title}
             </h1>
-            <span className={`text-[10px] tracking-wide block leading-tight mt-0.5 ${isDark ? 'text-white/70' : 'text-slate-500'}`}>
-              {config.subtitle}
-            </span>
           </div>
         </div>
 
         {/* Right Top Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Cloud Sync Status Pill */}
           <button
             type="button"
             onClick={handleManualSync}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md border transition-all duration-200 ${
+            className={`p-2 rounded-full transition-all duration-200 ${
               config.sync.provider === 'none'
                 ? isDark
-                  ? 'bg-white/10 border-white/15 text-white/70 hover:bg-white/20 hover:text-white'
-                  : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white hover:text-slate-900 shadow-sm'
+                  ? 'text-white/70 hover:text-white hover:bg-white/10'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-900/5'
                 : syncStatus.status === 'syncing'
-                ? 'bg-amber-500/20 border-amber-500/40 text-amber-500'
+                ? 'text-amber-500 hover:bg-amber-500/10'
                 : syncStatus.status === 'error'
-                ? 'bg-rose-500/20 border-rose-500/40 text-rose-500'
-                : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-300'
+                ? 'text-rose-500 hover:bg-rose-500/10'
+                : 'text-emerald-500 dark:text-emerald-400 hover:bg-emerald-500/10'
             }`}
-            title={syncStatus.message || '点击立即同步'}
+            title={syncStatus.message || (config.sync.provider === 'none' ? '未开启云同步 (点击管理配置)' : '点击立即同步')}
           >
             {syncStatus.status === 'syncing' ? (
-              <Loader2 size={13} className="animate-spin" />
+              <Loader2 size={16} className="animate-spin" />
             ) : syncStatus.status === 'error' ? (
-              <CloudAlert size={13} />
+              <CloudAlert size={16} />
             ) : config.sync.provider !== 'none' ? (
-              <CloudCheck size={13} />
+              <CloudCheck size={16} />
             ) : (
-              <Cloud size={13} />
+              <Cloud size={16} />
             )}
-            <span className="hidden sm:inline">
-              {config.sync.provider === 'none'
-                ? '未开启云同步'
-                : syncStatus.status === 'syncing'
-                ? '同步中...'
-                : syncStatus.status === 'error'
-                ? '同步错误'
-                : '云端就绪'}
-            </span>
           </button>
 
           {/* Edit Mode Toggle */}
           <button
             type="button"
             onClick={() => setEditMode(!editMode)}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md border transition-all duration-200 ${
+            className={`p-2 rounded-full transition-all duration-200 ${
               editMode
-                ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-md shadow-amber-500/30'
+                ? 'text-amber-500 bg-amber-500/15 hover:bg-amber-500/20'
                 : isDark
-                ? 'bg-white/10 border-white/15 text-white/80 hover:bg-white/20 hover:text-white'
-                : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white hover:text-slate-900 shadow-sm'
+                ? 'text-white/80 hover:text-white hover:bg-white/10'
+                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-900/5'
             }`}
             title={editMode ? '退出管理模式' : '编辑书签与分组'}
           >
-            {editMode ? <Check size={14} /> : <Edit3 size={14} />}
-            <span>{editMode ? '完成编辑' : '管理书签'}</span>
+            {editMode ? <Check size={16} /> : <Edit3 size={16} />}
+          </button>
+
+          {/* Quick Data Management Button */}
+          <button
+            type="button"
+            onClick={() => handleOpenSettings('backup')}
+            className={`p-2 rounded-full transition-all duration-200 ${
+              isDark
+                ? 'text-emerald-400 hover:text-emerald-300 hover:bg-white/10'
+                : 'text-emerald-600 hover:text-emerald-800 hover:bg-slate-900/5'
+            }`}
+            title="数据管理中心 (书签 HTML/JSON 导入与导出)"
+          >
+            <Database size={16} />
           </button>
 
           {/* Settings Trigger */}
           <button
             type="button"
-            onClick={() => setSettingsOpen(true)}
-            className={`p-2 rounded-full border backdrop-blur-md transition-all shadow-sm ${
+            onClick={() => handleOpenSettings('theme')}
+            className={`p-2 rounded-full transition-all duration-200 ${
               isDark
-                ? 'bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border-white/15'
-                : 'bg-white/80 hover:bg-white text-slate-700 hover:text-slate-950 border-slate-200'
+                ? 'text-white/80 hover:text-white hover:bg-white/10'
+                : 'text-slate-700 hover:text-slate-950 hover:bg-slate-900/5'
             }`}
             title="个性化设置 (主题·同步·引擎)"
           >
@@ -495,7 +532,7 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="relative z-20 flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-20">
-        {/* LyLme Spage 原版个人主页 (Page 主题) 站长名片专区 */}
+        {/* LyLme Spage Nav 原版个人主页 (Page 主题) 站长名片专区 */}
         {config.theme.preset === 'lylme-page' && (
           <motion.div
             initial={{ opacity: 0, y: -12 }}
@@ -568,6 +605,7 @@ export default function App() {
           isDarkMode={isDark}
           onEditLink={handleOpenEditLink}
           onDeleteLink={handleDeleteLink}
+          onReorderLinks={handleReorderLinks}
           onAddLink={handleOpenAddLink}
           onAddGroup={handleOpenAddGroup}
           onEditGroup={handleOpenEditGroup}
@@ -598,7 +636,7 @@ export default function App() {
               rel="noreferrer"
               className="hover:underline font-medium inline-flex items-center gap-1.5"
             >
-              <span>六零导航页</span>
+              <span>六零导航页 - LyLme Spage Nav</span>
               <span className="opacity-80 font-mono text-[11px]">(zhixiaotx/lylme_spage_nav)</span>
             </a>
           </span>
@@ -642,13 +680,15 @@ export default function App() {
         onChange={handleConfigUpdate}
         onManualSync={handleManualSync}
         syncStatus={syncStatus}
+        initialTab={settingsTab}
       />
 
       {/* Floating Actions: Back to top, Day/Night mode toggle, Settings trigger */}
       <FloatingActions
         isDarkMode={isDark}
         onToggleThemeMode={handleToggleThemeMode}
-        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettings={() => handleOpenSettings('theme')}
+        onOpenBackup={() => handleOpenSettings('backup')}
       />
     </div>
   );

@@ -6,6 +6,31 @@
 import { NavGroup, NavItem, AppConfig } from '../types';
 
 /**
+ * Strip HTML tags (e.g. <span>, <input>, <button>) and unescape HTML entities
+ */
+export function stripHtmlTags(str?: string): string {
+  if (!str) return '';
+  let result = str;
+
+  // Decode common HTML entities first
+  result = result
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&');
+
+  // Iteratively strip all HTML tags
+  let prev = '';
+  while (result !== prev) {
+    prev = result;
+    result = result.replace(/<[^>]*>/g, '');
+  }
+
+  return result.trim();
+}
+
+/**
  * Escape HTML special characters
  */
 function escapeHtml(str: string): string {
@@ -115,9 +140,10 @@ export function parseNetscapeBookmarksHtml(htmlString: string): {
 
   // Helper to create a new NavGroup
   const createGroup = (name: string, parentId?: string): NavGroup => {
+    const cleanName = stripHtmlTags(name) || '未命名分类';
     return {
       id: `grp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      name: name.trim() || '未命名分类',
+      name: cleanName,
       parentId: parentId || undefined,
       items: [],
     };
@@ -135,7 +161,7 @@ export function parseNetscapeBookmarksHtml(htmlString: string): {
         if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
           fallbackGroup.items.push({
             id: `link_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-            name: a.textContent?.trim() || href,
+            name: stripHtmlTags(a.textContent || '') || href,
             url: href,
             icon: a.getAttribute('icon') || undefined,
           });
@@ -167,7 +193,7 @@ export function parseNetscapeBookmarksHtml(htmlString: string): {
         }
 
         if (h3) {
-          const folderName = h3.textContent?.trim() || '未命名分类';
+          const folderName = stripHtmlTags(h3.textContent || '') || '未命名分类';
           // Filter out generic wrapper names if at root (like "书签栏" or "Bookmarks Bar")
           // but preserve them as categories
           const newGroup = createGroup(folderName, parentGroupId);
@@ -177,13 +203,47 @@ export function parseNetscapeBookmarksHtml(htmlString: string): {
             traverseDl(nestedDl, newGroup.id);
           }
         } else if (a) {
-          const href = a.getAttribute('href');
-          if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+          const rawHref = a.getAttribute('href')?.trim();
+          if (rawHref && !rawHref.startsWith('javascript:') && !rawHref.startsWith('place:')) {
+            let cleanUrl = rawHref;
+            if (cleanUrl.startsWith('//')) {
+              cleanUrl = 'https:' + cleanUrl;
+            } else if (!cleanUrl.match(/^[a-zA-Z]+:\/\//)) {
+              cleanUrl = 'https://' + cleanUrl;
+            }
+
+            // Extract description if present (from A attributes or sibling/child DD elements)
+            let description: string | undefined = undefined;
+
+            const attrDesc =
+              a.getAttribute('description') ||
+              a.getAttribute('comment') ||
+              a.getAttribute('note') ||
+              a.getAttribute('desc');
+            if (attrDesc) {
+              description = stripHtmlTags(attrDesc);
+            }
+
+            if (!description) {
+              const dd = child.querySelector('dd');
+              if (dd && dd.textContent) {
+                description = stripHtmlTags(dd.textContent);
+              }
+            }
+
+            if (!description && i + 1 < children.length && children[i + 1].tagName.toUpperCase() === 'DD') {
+              const nextDd = children[i + 1];
+              if (nextDd && nextDd.textContent) {
+                description = stripHtmlTags(nextDd.textContent);
+              }
+            }
+
             const item: NavItem = {
               id: `link_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-              name: a.textContent?.trim() || href,
-              url: href,
+              name: stripHtmlTags(a.textContent || '') || cleanUrl,
+              url: cleanUrl,
               icon: a.getAttribute('icon') || undefined,
+              description: description || undefined,
             };
 
             // If there's an active group, add to it
@@ -246,6 +306,8 @@ export function mergeGroupsIncrementally(
   // Map old imported group IDs to new/matched group IDs (to preserve parentId)
   const idMapping = new Map<string, string>();
 
+  const normalizeUrl = (url: string) => url.toLowerCase().trim().replace(/\/+$/, '');
+
   for (const impGroup of importedGroups) {
     const key = impGroup.name.toLowerCase().trim();
     let target = nameToGroupMap.get(key);
@@ -253,11 +315,11 @@ export function mergeGroupsIncrementally(
     if (target) {
       idMapping.set(impGroup.id, target.id);
       // Merge items into existing group
-      const existingUrls = new Set(target.items.map((it) => it.url.toLowerCase().trim()));
+      const existingUrls = new Set(target.items.map((it) => normalizeUrl(it.url)));
       for (const item of impGroup.items) {
-        if (!existingUrls.has(item.url.toLowerCase().trim())) {
+        if (!existingUrls.has(normalizeUrl(item.url))) {
           target.items.push({ ...item });
-          existingUrls.add(item.url.toLowerCase().trim());
+          existingUrls.add(normalizeUrl(item.url));
           addedBookmarksCount++;
         }
       }

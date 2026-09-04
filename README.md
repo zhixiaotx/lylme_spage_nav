@@ -1,6 +1,6 @@
-# 🌟 六零导航页 - LyLme Spage (Palette 增强版)
+# 🌟 六零导航页 - LyLme Spage Nav (Palette 增强版)
 
-> 基于 **LyLme Spage**：https://github.com/LyLme/lylme_spage 与 **Palette**：https://github.com/litxiaoxi/LyLme-Spage-Palette 深度重构与二次开发的现代化高颜值无服务器导航起始页。  
+> 基于 **LyLme Spage Nav**：https://github.com/LyLme/lylme_spage 与 **Palette**：https://github.com/litxiaoxi/LyLme-Spage-Palette 深度重构与二次开发的现代化高颜值无服务器导航起始页。  
 > 纯前端静态 + 云端边缘函数架构，支持海量书签无感秒开、日夜模式无缝切换、多级子目录分类、以及 Cloudflare KV / D1 / GitHub Gist / GitHub 仓库 / WebDAV (坚果云) 全平台云端实时同步。
 
 ---
@@ -32,18 +32,20 @@
 
 ## 🌟 核心特色与亮点
 
-- **⚡ 零服务器成本**：纯静态前端，可部署在 GitHub Pages、Cloudflare Pages、Vercel、Netlify 等任意平台。
+- **⚡ 零服务器成本与边缘计算**：纯静态前端，可部署在 GitHub Pages、Cloudflare Pages、Vercel、Netlify 等任意平台。
 - **🌓 电影级昼夜模式切换**：集成现代浏览器 View Transitions API，提供柔和丝滑的明暗滤镜与色彩过度，支持移动端沉浸式顶栏 `theme-color` 同步。
-- **🚀 10万级书签流畅渲染**：基于 `IntersectionObserver` 视口分批懒加载与 `React.memo` 浅记忆化，海量书签也能保持 60~120 FPS 丝滑滚动。
-- **☁️ 5大云同步后端**：
+- **🚀 10万级海量书签虚拟滚动 (Virtual Scrolling)**：当书签数量达到 500+ 或单个分组超过 60+ 项时，自动激活视口虚拟滚动 windowing 算法，仅渲染视口内可见卡片，突破 DOM 瓶颈，保持 60~120 FPS 极速流畅。
+- **☁️ 5大云同步后端与本地优先 (Local-First)**：
   - **Cloudflare KV** 边缘键值缓存
   - **Cloudflare D1** 边缘 SQL 关系数据库
   - **GitHub Gist** 私有/公开代码片段存储
   - **GitHub 独立代码仓库**（自动 Git Commit 记录）
   - **WebDAV / 坚果云** 跨平台网盘协议
+- **📂 HTML 浏览器书签全量与增量导入**：支持 Chrome、Edge、Firefox、Safari 等浏览器导出的 Netscape Bookmark HTML 文件，提供**增量合并去重**与**完全覆盖替换**两种策略，兼具数据迁移灵活性与安全。
+- **🛡️ 带有高危二次确认 (ConfirmModal) 的防护机制**：对恢复出厂设置、覆盖导入、清空书签等高危破坏性动作提供通用二次确认弹窗，有效防误触误删。
 - **🔍 智能搜索矩阵**：集成多款主流搜索引擎（百度、Google、Bing、GitHub、bilibili 等）与本地书签秒级检索，支持快捷键 `Ctrl + K` / `Cmd + K`。
 - **🖼️ 4K 高清壁纸中心**：Bing 每日高清壁纸、4K 精选图库、动态渐变、毛玻璃磨砂（Blur）与遮罩调节。
-- **🏷️ 多级分类与子目录树**：无限层级父子分类结构，支持折叠展开、分类标签筛选与批量拖拽管理。
+- **🏷️ 多级分类与手势滑动**：支持无限层级父子分类，移动端支持平滑手势横滑与分类侧边栏折叠。
 
 ---
 
@@ -309,14 +311,21 @@ Cloudflare Pages 提供全球顶级 Anycast CDN 加速，并且免费支持 Func
 
 ---
 
-## ⚡ 5万+ 海量书签虚拟分批懒加载架构
+## ⚡ 5万+ 海量书签虚拟窗口与分批懒加载架构 (Virtual Scrolling)
 
-为了支持拥有数万级庞大书签库的高级用户，`LinkGrid.tsx` 采用了优化的渲染流水线：
+为了支持拥有数万级庞大书签库的高级用户，`LinkGrid.tsx` 采用了双引擎渲染流水线：
 
-1. **按需分批进入 DOM**：默认仅渲染当前视口所需的前 60 项卡片，当下滑接近底部时由 `IntersectionObserver` 自动无缝载入后续分批。
-2. **组内实时快速检索**：针对包含大量网址的分类，自动提供组内即时筛选框，无需全局重搜即可过滤。
-3. **React.memo 浅记忆化**：对 `NavCard` 与 `QuickPinnedCard` 进行了组件级记忆化隔离，数据更新时只重绘变更卡片。
-4. **图标异步非阻塞解码**：所有图标图片均开启 `decoding="async"` 与 `loading="lazy"`，确保页面滚动帧率稳定在 60~120 FPS。
+1. **自动触发阈值 (Threshold)**：
+   - 当**全屏总书签数 ≥ 500** 或**单个分组书签数 ≥ 60** 时，系统自动无感切入 **Virtual Scrolling 虚拟滚动模式**。
+2. **动态视口计算与 Spacer 占位**：
+   - 基于实时 `scroll` 与 `resize` 监听器，动态计算当前网格列数 (2 ~ 8 列) 与行高 (`ROW_HEIGHT = 108px`)。
+   - 仅仅将当前视口区域加上上下缓冲行 (`OVERSCAN_ROWS = 3`) 的卡片元素放入 DOM 树中渲染，未渲染卡片以精确计算的 `topSpacerHeight` 和 `bottomSpacerHeight` 充当真实高度占位。
+3. **渐进式分批 (Batch Lazy Loading)**：
+   - 数据未达到虚拟滚动阈值时，采用 `IntersectionObserver` 哨兵自动无缝载入后续分批（初始 60 项，每次追加 60 项）。
+4. **React.memo 浅记忆化**：
+   - 对 `SortableNavCard` 与 `NavCard` 进行了组件级记忆化隔离，数据重排序或字段变更时仅重绘受影响节点。
+5. **图标异步非阻塞解码**：
+   - 所有图标图片均开启 `decoding="async"` 与 `loading="lazy"`，确保海量 DOM 下页面滚动帧率稳定维持在 60~120 FPS。
 
 ---
 
@@ -337,6 +346,10 @@ Cloudflare Pages 提供全球顶级 Anycast CDN 加速，并且免费支持 Func
 ### Q4: Cloudflare Pages 提示 `ONENAV_KV / SPAGE_KV binding not configured`？
 - **原因**：虽然创建了 KV，但尚未在 Pages 项目设置的 **Functions** 页面中将变量名称与创建的 KV 数据库进行绑定。
 - **解决方案**：前往 Pages 项目 -> **Settings** -> **Functions** -> **KV namespace bindings**，添加变量名 `ONENAV_KV` 并绑定你的 KV 数据库，然后点击 **Retry deployment**。
+
+### Q5: GitHub Actions 构建时报错 `Dependencies lock file is not found`？
+- **原因**：`actions/setup-node` 开启了 `cache: 'npm'` 时会严格检测根目录的 `package-lock.json`。
+- **解决方案**：本项目已更新 `.github/workflows/deploy.yml`，移除了硬性缓存依赖并生成了标准的 `package-lock.json`，直接使用 `npm install` 安装依赖并自动构建。
 
 ---
 

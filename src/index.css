@@ -4,8 +4,32 @@
   color-scheme: light;
 }
 
-html.dark {
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #0b0f19;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+html.dark, html.dark body {
   color-scheme: dark;
+  background-color: #09090b;
+}
+
+html.light, html.light body {
+  color-scheme: light;
+  background-color: #f8fafc;
 }
 
 /* Global Smooth Day/Night Transition & Crisp Scrollbar */

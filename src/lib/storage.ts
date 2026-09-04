@@ -4,7 +4,43 @@ import {
   downloadNetscapeBookmarksHtml,
   parseNetscapeBookmarksHtml,
   mergeGroupsIncrementally,
+  stripHtmlTags,
 } from './bookmarkParser';
+
+/**
+ * Sanitize all group names and item names/descriptions to remove any raw HTML tags (e.g. <span>, <input>)
+ */
+export const sanitizeGroups = (groups: any[]): any[] => {
+  if (!Array.isArray(groups)) return [];
+  return groups.map((g) => {
+    const groupName = stripHtmlTags(g.name || g.title || g.category || '未命名分类');
+    const itemsList = Array.isArray(g.items) ? g.items : Array.isArray(g.links) ? g.links : [];
+
+    return {
+      ...g,
+      name: groupName,
+      items: itemsList.map((it: any) => {
+        const rawName = it.name || it.title || it.label || it.url || '未命名书签';
+        const rawUrl = it.url || it.link || it.href || '';
+        const rawDesc =
+          it.description ??
+          it.desc ??
+          it.remark ??
+          it.subtitle ??
+          it.sub_title ??
+          it.comment ??
+          it.notes;
+
+        return {
+          ...it,
+          name: stripHtmlTags(rawName),
+          url: rawUrl,
+          description: rawDesc ? stripHtmlTags(String(rawDesc)) : undefined,
+        };
+      }),
+    };
+  });
+};
 
 const STORAGE_KEY = 'lylme_spage_config_v2';
 
@@ -52,6 +88,24 @@ export const saveConfig = (config: AppConfig) => {
  * Merge partial or legacy stored configuration safely with default properties
  */
 export const mergeWithDefaults = (stored: Partial<AppConfig>): AppConfig => {
+  // Ensure 'LyLme Spage' in stored strings is migrated to 'LyLme Spage Nav'
+  let title = stored.title || DEFAULT_CONFIG.title;
+  if (title === '六零导航页') {
+    title = DEFAULT_CONFIG.title;
+  } else if (title.includes('LyLme Spage')) {
+    title = title.replace(/LyLme Spage(?! Nav)/g, 'LyLme Spage Nav');
+  }
+
+  let subtitle = stored.subtitle || DEFAULT_CONFIG.subtitle;
+  if (subtitle && subtitle.includes('LyLme Spage')) {
+    subtitle = subtitle.replace(/LyLme Spage(?! Nav)/g, 'LyLme Spage Nav');
+  }
+
+  let description = stored.description || DEFAULT_CONFIG.description;
+  if (description && description.includes('LyLme Spage')) {
+    description = description.replace(/LyLme Spage(?! Nav)/g, 'LyLme Spage Nav');
+  }
+
   // Merge search engines to include new built-in engines while preserving user custom engines
   let mergedEngines = DEFAULT_CONFIG.searchEngines;
   if (stored.searchEngines && stored.searchEngines.length > 0) {
@@ -70,6 +124,9 @@ export const mergeWithDefaults = (stored: Partial<AppConfig>): AppConfig => {
   return {
     ...DEFAULT_CONFIG,
     ...stored,
+    title,
+    subtitle,
+    description,
     version: DEFAULT_CONFIG.version,
     icp: stored.icp !== undefined ? stored.icp : (DEFAULT_CONFIG.icp || ''),
     theme: {
@@ -87,7 +144,7 @@ export const mergeWithDefaults = (stored: Partial<AppConfig>): AppConfig => {
       customApi: { ...DEFAULT_CONFIG.sync.customApi, ...(stored.sync?.customApi || {}) },
     },
     searchEngines: mergedEngines,
-    groups: stored.groups && stored.groups.length > 0 ? stored.groups : DEFAULT_CONFIG.groups,
+    groups: stored.groups && stored.groups.length > 0 ? sanitizeGroups(stored.groups) : DEFAULT_CONFIG.groups,
   };
 };
 
@@ -147,7 +204,7 @@ export const pushToGist = async (config: AppConfig): Promise<SyncResult> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        description: `LyLme Spage Config Backup (Updated: ${new Date().toLocaleString()})`,
+        description: `LyLme Spage Nav Config Backup (Updated: ${new Date().toLocaleString()})`,
         files: {
           [filename]: {
             content: JSON.stringify(config, null, 2),
@@ -178,7 +235,7 @@ export const createNewGist = async (token: string, initialConfig: AppConfig): Pr
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        description: '六零导航页 LyLme Spage 云端同步配置',
+        description: '六零导航页 LyLme Spage Nav 云端同步配置',
         public: false,
         files: {
           'lylme_spage.json': {
@@ -311,7 +368,7 @@ export const pushToGithubRepo = async (config: AppConfig): Promise<SyncResult> =
     const putUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${cleanPath}`;
 
     const bodyPayload: Record<string, any> = {
-      message: `Update LyLme Spage navigation config [sync at ${new Date().toLocaleString()}]`,
+      message: `Update LyLme Spage Nav navigation config [sync at ${new Date().toLocaleString()}]`,
       content: base64Content,
       branch: cleanBranch,
     };
@@ -968,7 +1025,7 @@ export const importConfigJsonWithOptions = (
           resolve({ config: merged, addedCount: merged.groups.reduce((a, b) => a + b.items.length, 0) });
         } else {
           // Incremental Merge:
-          const parsedGroups = Array.isArray(parsed.groups) ? parsed.groups : [];
+          const parsedGroups = Array.isArray(parsed.groups) ? sanitizeGroups(parsed.groups) : [];
           const { mergedGroups, addedBookmarksCount } = mergeGroupsIncrementally(
             currentConfig.groups,
             parsedGroups

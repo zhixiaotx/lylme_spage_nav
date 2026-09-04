@@ -22,7 +22,7 @@ export interface ThemePresetMeta {
 
 export const ALL_THEMES: Record<ThemePreset, ThemePresetMeta> = {
   /* =========================================================================
-     1. 原项目 LyLme Spage 官方原生主题 (Official Templates)
+     1. 原项目 LyLme Spage Nav 官方原生主题 (Official Templates)
      ========================================================================= */
   'lylme-default': {
     id: 'lylme-default',
@@ -30,7 +30,7 @@ export const ALL_THEMES: Record<ThemePreset, ThemePresetMeta> = {
     name: 'LyLme Default',
     nameZh: '六零原生经典',
     badge: '官方原生',
-    description: 'LyLme Spage 官方原生默认主题，经典海天蓝调搜索框，圆角网格卡片与分类徽标',
+    description: 'LyLme Spage Nav 官方原生默认主题，经典海天蓝调搜索框，圆角网格卡片与分类徽标',
     backgroundCss: 'linear-gradient(135deg, #eef2f6 0%, #e0e7ff 50%, #dbeafe 100%)',
     defaultBgUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2560&q=80',
     cardBgClass: 'bg-white/90 shadow-md backdrop-blur-md',
@@ -78,7 +78,7 @@ export const ALL_THEMES: Record<ThemePreset, ThemePresetMeta> = {
     name: 'Page Profile',
     nameZh: '个人主页/发布页',
     badge: 'Page单页',
-    description: 'LyLme Spage 官方个人主页/发布页主题，居中站长名片与社交矩阵，单页引导流',
+    description: 'LyLme Spage Nav 官方个人主页/发布页主题，居中站长名片与社交矩阵，单页引导流',
     backgroundCss: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
     defaultBgUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2560&q=80',
     cardBgClass: 'bg-slate-800/70 shadow-lg backdrop-blur-md',
@@ -275,8 +275,8 @@ export const PALETTE_THEMES = ALL_THEMES;
 
 export const DEFAULT_CONFIG: AppConfig = {
   version: '2.2.0',
-  title: '六零导航页',
-  subtitle: 'LyLme Spage (Palette 完整主题版)',
+  title: '六零导航页 - LyLme Spage Nav',
+  subtitle: 'LyLme Spage Nav (Palette 完整主题版)',
   description: '简洁高效·原版主题与Palette全量集成·无服务器部署·多云实时同步',
   icp: '',
   searchEngines: SEARCH_ENGINES,

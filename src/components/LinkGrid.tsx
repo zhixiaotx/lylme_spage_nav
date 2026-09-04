@@ -10,7 +10,6 @@ import {
   Globe,
   Folder,
   Hash,
-  CornerDownRight,
   ChevronDown,
   ChevronRight,
   FolderTree,
@@ -19,10 +18,32 @@ import {
   Minimize2,
   Search,
   Zap,
+  GripVertical,
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Favicon } from './Favicon';
+import { stripHtmlTags } from '../lib/bookmarkParser';
 
 const STORAGE_COLLAPSED_KEY = 'lylme_collapsed_groups_v1';
+const INITIAL_BATCH_SIZE = 36;
+const BATCH_LOAD_STEP = 36;
+const VIRTUAL_SCROLL_THRESHOLD = 500;
 
 interface LinkGridProps {
   groups: NavGroup[];
@@ -31,6 +52,7 @@ interface LinkGridProps {
   isDarkMode?: boolean;
   onEditLink: (item: NavItem, groupId: string) => void;
   onDeleteLink: (itemId: string, groupId: string) => void;
+  onReorderLinks?: (groupId: string, items: NavItem[]) => void;
   onAddLink: (groupId: string) => void;
   onAddGroup: () => void;
   onEditGroup: (group: NavGroup) => void;
@@ -48,6 +70,7 @@ export function LinkGrid({
   isDarkMode = false,
   onEditLink,
   onDeleteLink,
+  onReorderLinks,
   onAddLink,
   onAddGroup,
   onEditGroup,
@@ -59,6 +82,14 @@ export function LinkGrid({
 }: LinkGridProps) {
   const [activeTabId, setActiveTabId] = useState<string>('all');
   const [activeSubTabId, setActiveSubTabId] = useState<string>('all');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+
+  // Total bookmarks count for virtual scrolling threshold determination (>500)
+  const totalBookmarkCount = useMemo(() => {
+    return groups.reduce((acc, g) => acc + g.items.length, 0);
+  }, [groups]);
+
+  const isVirtualModeGlobal = totalBookmarkCount >= VIRTUAL_SCROLL_THRESHOLD;
 
   // Collapse state per group with LocalStorage persistence
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
@@ -192,18 +223,18 @@ export function LinkGrid({
         </section>
       )}
 
-      {/* Tabs Navigation Selector (If tabs mode) */}
+      {/* Tabs Navigation Selector (If tabs mode with smooth gesture touch swipe on mobile) */}
       {theme.layoutMode === 'tabs' && (
         <div className="space-y-3 pt-2 pb-4">
-          {/* Main Top-Level Categories */}
-          <div className="flex items-center justify-center flex-wrap gap-2">
+          {/* Main Top-Level Categories - Gesture Swipe Container */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap py-1.5 px-2 sm:flex-wrap sm:justify-center -mx-4 sm:mx-0">
             <button
               type="button"
               onClick={() => {
                 setActiveTabId('all');
                 setActiveSubTabId('all');
               }}
-              className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all shadow-sm ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all shadow-sm shrink-0 ${
                 activeTabId === 'all'
                   ? isDarkMode
                     ? 'bg-white/25 text-white shadow-md backdrop-blur-lg border border-white/40'
@@ -229,7 +260,7 @@ export function LinkGrid({
                     setActiveTabId(group.id);
                     setActiveSubTabId('all');
                   }}
-                  className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all shadow-sm ${
+                  className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all shadow-sm shrink-0 ${
                     isSelected
                       ? isDarkMode
                         ? 'bg-white/25 text-white shadow-md backdrop-blur-lg border border-white/40'
@@ -245,13 +276,13 @@ export function LinkGrid({
             })}
           </div>
 
-          {/* Subcategories Secondary Filter (If active tab has subcategories) */}
+          {/* Subcategories Secondary Filter */}
           {activeTabId !== 'all' && currentSubGroups.length > 0 && (
-            <div className="flex items-center justify-center flex-wrap gap-1.5 pt-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap py-1 px-2 sm:flex-wrap sm:justify-center -mx-4 sm:mx-0">
               <button
                 type="button"
                 onClick={() => setActiveSubTabId('all')}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all shrink-0 ${
                   activeSubTabId === 'all'
                     ? 'bg-sky-500/30 text-sky-200 border border-sky-400/40 shadow-sm'
                     : isDarkMode
@@ -266,7 +297,7 @@ export function LinkGrid({
                   key={sub.id}
                   type="button"
                   onClick={() => setActiveSubTabId(sub.id)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1 ${
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1 shrink-0 ${
                     activeSubTabId === sub.id
                       ? 'bg-sky-500/30 text-sky-200 border border-sky-400/40 shadow-sm'
                       : isDarkMode
@@ -274,7 +305,6 @@ export function LinkGrid({
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                   }`}
                 >
-                  <CornerDownRight size={10} className="opacity-60" />
                   <span>{sub.name} ({sub.items.length})</span>
                 </button>
               ))}
@@ -285,9 +315,33 @@ export function LinkGrid({
 
       {/* Sidebar Layout Mode Structure */}
       {theme.layoutMode === 'sidebar' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
+          {/* Mobile Toggle Button for Collapsible Sidebar Index */}
+          <div className="lg:hidden">
+            <button
+              type="button"
+              onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+              className={`w-full flex items-center justify-between p-3.5 rounded-2xl border shadow-md transition-all ${
+                isDarkMode
+                  ? 'bg-slate-900/80 border-white/20 text-white'
+                  : 'bg-white/90 border-slate-200 text-slate-800'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <FolderTree size={16} className="text-sky-500" />
+                <span className="text-xs font-bold">快捷分类索引 ({topLevelGroups.length} 个大类)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-sky-400 font-medium">
+                <span>{isMobileSidebarOpen ? '收起面板' : '展开选择'}</span>
+                <ChevronDown size={16} className={`transition-transform duration-200 ${isMobileSidebarOpen ? 'rotate-180' : ''}`} />
+              </div>
+            </button>
+          </div>
+
           {/* Sidebar Category List */}
-          <div className={`lg:col-span-1 sticky top-8 rounded-2xl p-4 border shadow-xl space-y-2 backdrop-blur-2xl ${
+          <div className={`lg:col-span-1 lg:sticky top-8 rounded-2xl p-4 border shadow-xl space-y-2 backdrop-blur-2xl ${
+            isMobileSidebarOpen ? 'block' : 'hidden lg:block'
+          } ${
             isDarkMode
               ? 'bg-white/10 border-white/20 text-white'
               : 'bg-white/85 border-slate-200 text-slate-800'
@@ -338,7 +392,6 @@ export function LinkGrid({
                             }`}
                           >
                             <span className="flex items-center gap-1.5 truncate">
-                              <CornerDownRight size={11} className="opacity-50 shrink-0 text-sky-400" />
                               <span className="truncate">{sub.name}</span>
                             </span>
                             <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
@@ -388,6 +441,7 @@ export function LinkGrid({
                 onToggleCollapse={() => toggleGroupCollapse(group.id)}
                 onEditLink={onEditLink}
                 onDeleteLink={onDeleteLink}
+                onReorderLinks={onReorderLinks}
                 onAddLink={onAddLink}
                 onEditGroup={onEditGroup}
                 onDeleteGroup={onDeleteGroup}
@@ -416,6 +470,7 @@ export function LinkGrid({
                 onToggleCollapse={() => toggleGroupCollapse(group.id)}
                 onEditLink={onEditLink}
                 onDeleteLink={onDeleteLink}
+                onReorderLinks={onReorderLinks}
                 onAddLink={onAddLink}
                 onEditGroup={onEditGroup}
                 onDeleteGroup={onDeleteGroup}
@@ -466,13 +521,11 @@ interface GroupSectionProps {
   onToggleCollapse?: () => void;
   onEditLink: (item: NavItem, groupId: string) => void;
   onDeleteLink: (itemId: string, groupId: string) => void;
+  onReorderLinks?: (groupId: string, items: NavItem[]) => void;
   onAddLink: (groupId: string) => void;
   onEditGroup: (group: NavGroup) => void;
   onDeleteGroup: (groupId: string) => void;
 }
-
-const INITIAL_BATCH_SIZE = 60;
-const BATCH_LOAD_STEP = 60;
 
 function GroupSection({
   group,
@@ -489,6 +542,7 @@ function GroupSection({
   onToggleCollapse,
   onEditLink,
   onDeleteLink,
+  onReorderLinks,
   onAddLink,
   onEditGroup,
   onDeleteGroup,
@@ -496,11 +550,61 @@ function GroupSection({
   const [renderedLimit, setRenderedLimit] = useState<number>(INITIAL_BATCH_SIZE);
   const [inGroupFilter, setInGroupFilter] = useState<string>('');
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [scrollPos, setScrollPos] = useState({ scrollTop: 0, vh: 800 });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !onReorderLinks) return;
+
+    const oldIndex = group.items.findIndex((item) => item.id === active.id);
+    const newIndex = group.items.findIndex((item) => item.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const reordered = arrayMove(group.items, oldIndex, newIndex);
+      onReorderLinks(group.id, reordered);
+    }
+  };
 
   // Reset rendered limit when group changes or filter query changes
   useEffect(() => {
     setRenderedLimit(INITIAL_BATCH_SIZE);
   }, [group.id, inGroupFilter]);
+
+  // Window scroll observer for Virtual Scrolling window calculation
+  useEffect(() => {
+    let animationFrameId: number;
+    const updateScroll = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(() => {
+        setScrollPos({
+          scrollTop: window.scrollY || document.documentElement.scrollTop,
+          vh: window.innerHeight,
+        });
+      });
+    };
+
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    window.addEventListener('resize', updateScroll, { passive: true });
+    updateScroll();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('scroll', updateScroll);
+      window.removeEventListener('resize', updateScroll);
+    };
+  }, []);
 
   const parentGroup = group.parentId
     ? allGroups.find((g) => g.id === group.parentId)
@@ -520,32 +624,8 @@ function GroupSection({
     );
   }, [group.items, inGroupFilter]);
 
-  const visibleItems = useMemo(() => {
-    return filteredItems.slice(0, renderedLimit);
-  }, [filteredItems, renderedLimit]);
-
-  const hasMore = visibleItems.length < filteredItems.length;
-
-  // Infinite lazy batch loader when user scrolls down
-  useEffect(() => {
-    if (isCollapsed || !hasMore) return;
-    const currentSentinel = sentinelRef.current;
-    if (!currentSentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setRenderedLimit((prev) => Math.min(prev + BATCH_LOAD_STEP, filteredItems.length));
-        }
-      },
-      {
-        rootMargin: '500px',
-      }
-    );
-
-    observer.observe(currentSentinel);
-    return () => observer.disconnect();
-  }, [isCollapsed, hasMore, filteredItems.length, renderedLimit]);
+  // Render all items in the group directly without virtual slicing or pagination buttons
+  const visibleItems = filteredItems;
 
   const gridColsClass =
     theme.layoutMode === 'sidebar'
@@ -566,66 +646,19 @@ function GroupSection({
           <h3
             className={`text-base md:text-lg font-bold tracking-tight text-left select-none ${textClass}`}
           >
-            {group.name}
+            {stripHtmlTags(group.name)}
           </h3>
 
-          {/* Subcategory Visual Indicator Badge */}
-          {subCategories.length > 0 && (
-            <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1 border ${
-              isDarkMode
-                ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
-                : 'bg-indigo-50 text-indigo-700 border-indigo-200'
-            }`}>
-              <FolderTree size={11} />
-              <span>{subCategories.length} 个子目录</span>
-            </span>
-          )}
-
-          {parentGroup && (
-            <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1 border ${
-              isDarkMode
-                ? 'bg-sky-500/20 text-sky-300 border-sky-500/30'
-                : 'bg-sky-50 text-sky-700 border-sky-200'
-            }`}>
-              <CornerDownRight size={11} />
-              <span>所属: {parentGroup.name}</span>
+          {editMode && (
+            <span className="text-[11px] px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center gap-1 select-none">
+              <GripVertical size={11} />
+              <span>拖拽卡片调整排序</span>
             </span>
           )}
         </div>
 
-        {/* Right side controls: In-group search filter (if group is large) & edit controls */}
+        {/* Right side controls: Edit controls */}
         <div className="flex items-center gap-2">
-          {group.items.length > 18 && (
-            <div className="relative flex items-center">
-              <Search
-                size={12}
-                className={`absolute left-2.5 pointer-events-none opacity-50 ${
-                  isDarkMode ? 'text-white' : 'text-slate-700'
-                }`}
-              />
-              <input
-                type="text"
-                value={inGroupFilter}
-                onChange={(e) => setInGroupFilter(e.target.value)}
-                placeholder="组内筛选..."
-                className={`text-xs pl-7 pr-5 py-1 rounded-lg border backdrop-blur-md outline-none transition-all duration-200 w-24 sm:w-32 focus:w-44 ${
-                  isDarkMode
-                    ? 'bg-white/10 border-white/20 text-white placeholder-white/40 focus:border-sky-400'
-                    : 'bg-white/80 border-slate-200 text-slate-800 placeholder-slate-400 focus:border-sky-500'
-                }`}
-              />
-              {inGroupFilter && (
-                <button
-                  type="button"
-                  onClick={() => setInGroupFilter('')}
-                  className="absolute right-1.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-white"
-                  title="清除组内筛选"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          )}
 
           {editMode && (
             <div className="flex items-center gap-1">
@@ -662,99 +695,59 @@ function GroupSection({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className={gridColsClass}>
-              {visibleItems.map((item) => (
-                <NavCard
-                  key={item.id}
-                  item={item}
-                  groupId={group.id}
-                  theme={theme}
-                  editMode={editMode}
-                  isDarkMode={isDarkMode}
-                  radiusClass={radiusClass}
-                  cardBgClass={cardBgClass}
-                  cardBorderClass={cardBorderClass}
-                  textClass={textClass}
-                  subtextClass={subtextClass}
-                  onEdit={() => onEditLink(item, group.id)}
-                  onDelete={() => onDeleteLink(item.id, group.id)}
-                />
-              ))}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={visibleItems.map((it) => it.id)}
+                strategy={rectSortingStrategy}
+                disabled={!editMode}
+              >
+                <div ref={gridContainerRef} className="w-full">
+                  <div className={gridColsClass}>
+                    {visibleItems.map((item) => (
+                      <SortableNavCard
+                        key={item.id}
+                        item={item}
+                        groupId={group.id}
+                        theme={theme}
+                        editMode={editMode}
+                        isDarkMode={isDarkMode}
+                        radiusClass={radiusClass}
+                        cardBgClass={cardBgClass}
+                        cardBorderClass={cardBorderClass}
+                        textClass={textClass}
+                        subtextClass={subtextClass}
+                        onEdit={() => onEditLink(item, group.id)}
+                        onDelete={() => onDeleteLink(item.id, group.id)}
+                      />
+                    ))}
 
-              {/* Add Link Card in Edit Mode */}
-              {editMode && (
-                <button
-                  type="button"
-                  onClick={() => onAddLink(group.id)}
-                  className={`flex flex-col items-center justify-center p-5 border-2 border-dashed ${radiusClass} transition-all duration-200 min-h-[110px] group ${
-                    isDarkMode
-                      ? 'border-white/30 hover:border-white/60 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
-                      : 'border-slate-300 hover:border-slate-500 bg-white/60 hover:bg-white text-slate-700 hover:text-slate-900 shadow-sm'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 transition-colors ${
-                    isDarkMode ? 'bg-white/10 group-hover:bg-white/20' : 'bg-slate-200/80 group-hover:bg-slate-300'
-                  }`}>
-                    <Plus size={20} />
+                    {/* Add Link Card in Edit Mode */}
+                    {editMode && (
+                      <button
+                        type="button"
+                        onClick={() => onAddLink(group.id)}
+                        className={`flex flex-col items-center justify-center p-5 border-2 border-dashed ${radiusClass} transition-all duration-200 min-h-[110px] group ${
+                          isDarkMode
+                            ? 'border-white/30 hover:border-white/60 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                            : 'border-slate-300 hover:border-slate-500 bg-white/60 hover:bg-white text-slate-700 hover:text-slate-900 shadow-sm'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 transition-colors ${
+                          isDarkMode ? 'bg-white/10 group-hover:bg-white/20' : 'bg-slate-200/80 group-hover:bg-slate-300'
+                        }`}>
+                          <Plus size={20} />
+                        </div>
+                        <span className="text-xs font-semibold">添加书签</span>
+                      </button>
+                    )}
                   </div>
-                  <span className="text-xs font-semibold">添加书签</span>
-                </button>
-              )}
-            </div>
-
-            {/* Batch Status Bar & Controls (Displayed when dataset is large) */}
-            {filteredItems.length > INITIAL_BATCH_SIZE && (
-              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-3.5 px-1 text-xs">
-                <span className={`font-mono text-[11px] opacity-75 ${subtextClass}`}>
-                  已展示 {visibleItems.length} / 共 {filteredItems.length} 项
-                  {inGroupFilter ? ` (匹配 "${inGroupFilter}")` : ''}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  {hasMore && (
-                    <button
-                      type="button"
-                      onClick={() => setRenderedLimit((prev) => Math.min(prev + BATCH_LOAD_STEP, filteredItems.length))}
-                      className={`px-3 py-1.5 rounded-xl font-semibold transition-all border shadow-sm ${
-                        isDarkMode
-                          ? 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
-                          : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
-                      }`}
-                    >
-                      + 加载下批 ({Math.min(BATCH_LOAD_STEP, filteredItems.length - visibleItems.length)}项)
-                    </button>
-                  )}
-
-                  {hasMore && (
-                    <button
-                      type="button"
-                      onClick={() => setRenderedLimit(filteredItems.length)}
-                      className={`px-3 py-1.5 rounded-xl font-semibold transition-all border flex items-center gap-1 shadow-sm ${
-                        isDarkMode
-                          ? 'bg-sky-500/20 hover:bg-sky-500/30 border-sky-500/30 text-sky-300'
-                          : 'bg-sky-50 hover:bg-sky-100 border-sky-200 text-sky-700'
-                      }`}
-                    >
-                      <Zap size={12} />
-                      <span>全量加载 ({filteredItems.length}项)</span>
-                    </button>
-                  )}
-
-                  {renderedLimit > INITIAL_BATCH_SIZE && (
-                    <button
-                      type="button"
-                      onClick={() => setRenderedLimit(INITIAL_BATCH_SIZE)}
-                      className={`px-2.5 py-1.5 rounded-xl font-medium transition-colors opacity-75 hover:opacity-100 ${subtextClass}`}
-                    >
-                      ⇡ 收起分批
-                    </button>
-                  )}
                 </div>
-              </div>
-            )}
-
-            {/* Intersection Sentinel Element for auto lazy loading on scroll */}
-            {hasMore && <div ref={sentinelRef} className="h-4 w-full" aria-hidden="true" />}
+              </SortableContext>
+            </DndContext>
           </motion.div>
         )}
       </AnimatePresence>
@@ -763,10 +756,10 @@ function GroupSection({
 }
 
 /* =========================================================================
-   Subcomponent: Standard Navigation Card (Memoized for max render performance)
+   Subcomponent: Sortable Navigation Card (with dnd-kit support)
    ========================================================================= */
 
-interface NavCardProps {
+interface SortableNavCardProps {
   key?: string;
   item: NavItem;
   groupId: string;
@@ -782,7 +775,7 @@ interface NavCardProps {
   onDelete: () => void;
 }
 
-const NavCard = memo(function NavCard({
+const SortableNavCard = memo(function SortableNavCard({
   item,
   theme,
   editMode,
@@ -794,22 +787,63 @@ const NavCard = memo(function NavCard({
   subtextClass,
   onEdit,
   onDelete,
-}: NavCardProps) {
+}: SortableNavCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: item.id,
+    disabled: !editMode,
+  });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.4 : 1,
+    touchAction: editMode ? 'none' : undefined,
+  };
+
   return (
-    <div className="relative group">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative group ${
+        isDragging ? 'scale-105 shadow-2xl ring-2 ring-sky-500 rounded-2xl' : ''
+      }`}
+    >
       <motion.a
         href={editMode ? undefined : item.url}
         target={theme.openInNewTab ? '_blank' : '_self'}
         rel="noopener noreferrer"
-        whileHover={{ scale: editMode ? 1 : 1.03, y: editMode ? 0 : -3 }}
-        whileTap={{ scale: editMode ? 1 : 0.98 }}
-        className={`relative flex items-center gap-3.5 p-3.5 ${radiusClass} ${cardBgClass} border ${cardBorderClass} shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden cursor-pointer block select-none`}
+        whileHover={{ scale: editMode ? 1.01 : 1.03, y: editMode ? 0 : -3 }}
+        whileTap={{ scale: editMode ? 0.99 : 0.98 }}
+        className={`relative flex items-center gap-3 p-3 sm:gap-3.5 sm:p-3.5 ${radiusClass} ${cardBgClass} border ${cardBorderClass} shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden select-none ${
+          editMode
+            ? 'cursor-grab active:cursor-grabbing hover:border-sky-400/50'
+            : 'cursor-pointer'
+        }`}
         style={{
           backdropFilter: `blur(${theme.blur}px)`,
         }}
+        {...(editMode ? { ...attributes, ...listeners } : {})}
       >
+        {/* Drag handle icon indicator in editMode */}
+        {editMode && (
+          <div
+            className="text-sky-400 opacity-60 group-hover:opacity-100 transition-opacity -mr-1 shrink-0 cursor-grab active:cursor-grabbing"
+            title="按住拖拽调整顺序"
+          >
+            <GripVertical size={16} />
+          </div>
+        )}
+
         {/* Favicon / Icon without filled background rectangle */}
-        <div className="w-9 h-9 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center shrink-0">
           <Favicon
             url={item.url}
             name={item.name}
@@ -829,9 +863,9 @@ const NavCard = memo(function NavCard({
                   ? 'break-words whitespace-normal line-clamp-2 leading-snug'
                   : 'truncate block'
               } ${textClass}`}
-              title={item.name}
+              title={stripHtmlTags(item.name)}
             >
-              {item.name}
+              {stripHtmlTags(item.name)}
             </span>
             {item.isPinned && (
               <Star size={10} className="text-amber-400 fill-amber-400 shrink-0" />
@@ -844,9 +878,9 @@ const NavCard = memo(function NavCard({
                   ? 'break-words whitespace-normal line-clamp-2'
                   : 'truncate'
               } mt-0.5 leading-relaxed ${subtextClass}`}
-              title={item.description}
+              title={stripHtmlTags(item.description)}
             >
-              {item.description}
+              {stripHtmlTags(item.description)}
             </p>
           ) : (
             <p className={`text-[10px] truncate mt-0.5 opacity-50 ${subtextClass}`}>
@@ -922,6 +956,8 @@ const QuickPinnedCard = memo(function QuickPinnedCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const subtextClass = isDarkMode ? 'text-slate-300' : 'text-slate-600';
+
   return (
     <div className="relative group">
       <motion.a
@@ -941,7 +977,14 @@ const QuickPinnedCard = memo(function QuickPinnedCard({
             roundedClassName=""
           />
         </div>
-        <span className={`text-xs font-semibold truncate ${textClass}`}>{item.name}</span>
+        <div className="flex-1 min-w-0">
+          <span className={`text-xs font-semibold truncate block ${textClass}`}>{stripHtmlTags(item.name)}</span>
+          {item.description && (
+            <p className={`text-[10px] truncate mt-0.5 opacity-75 ${subtextClass}`} title={stripHtmlTags(item.description)}>
+              {stripHtmlTags(item.description)}
+            </p>
+          )}
+        </div>
       </motion.a>
 
       {editMode && (

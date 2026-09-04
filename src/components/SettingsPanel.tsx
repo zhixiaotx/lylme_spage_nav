@@ -74,6 +74,7 @@ import {
   restoreFactoryDefaults,
 } from '../lib/storage';
 import { ExportAuthModal } from './ExportAuthModal';
+import { ConfirmModal } from './ConfirmModal';
 import { isExportAuthenticated } from '../lib/exportAuth';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -88,6 +89,7 @@ interface SettingsPanelProps {
     message?: string;
     lastSyncedAt?: number;
   };
+  initialTab?: 'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup';
 }
 
 export function SettingsPanel({
@@ -97,10 +99,17 @@ export function SettingsPanel({
   onChange,
   onManualSync,
   syncStatus,
+  initialTab = 'theme',
 }: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState<
     'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup'
-  >('theme');
+  >(initialTab);
+
+  React.useEffect(() => {
+    if (isOpen && initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
   const [themeCategoryFilter, setThemeCategoryFilter] = useState<'all' | 'official' | 'palette'>('all');
   const [wallpaperCategoryFilter, setWallpaperCategoryFilter] = useState<WallpaperCategory | 'all'>('all');
   const [customWallpaperInput, setCustomWallpaperInput] = useState<string>(
@@ -380,45 +389,127 @@ export function SettingsPanel({
     }
   };
 
-  // File Import handler (JSON) with Merge / Overwrite options
+  // Core logic to import JSON file
+  const processJsonFile = async (file: File) => {
+    const doImport = async () => {
+      try {
+        const result = await importConfigJsonWithOptions(file, config, importStrategy);
+        onChange(result.config);
+        setDataActionNotice({
+          type: 'success',
+          message: `JSON 配置导入成功 (${importStrategy === 'merge' ? `增量合并，共添加/更新 ${result.addedCount} 项` : '完全覆盖'})！`,
+        });
+      } catch (err: any) {
+        setDataActionNotice({
+          type: 'error',
+          message: `JSON 导入失败: ${err.message}`,
+        });
+      }
+    };
+
+    if (importStrategy === 'overwrite') {
+      setConfirmModal({
+        isOpen: true,
+        title: '警告：确认要完全覆盖替换当前所有配置与书签？',
+        message: '【完全覆盖模式】将使用 JSON 备份中的数据彻底替换当前所有分组、书签与主题设置。当前数据将被清空覆盖。',
+        confirmText: '确认覆盖导入',
+        danger: true,
+        action: () => {
+          doImport();
+          setConfirmModal(null);
+        },
+      });
+      return;
+    }
+
+    await doImport();
+  };
+
+  // Core logic to import HTML bookmark file
+  const processHtmlFile = async (file: File) => {
+    const doImport = async () => {
+      try {
+        const result = await importBookmarksHtmlWithOptions(file, config, importStrategy);
+        onChange(result.config);
+        setDataActionNotice({
+          type: 'success',
+          message: `HTML 浏览器书签导入成功 (${importStrategy === 'merge' ? `增量合并，导入 ${result.groupCount} 个分组、${result.count} 个书签` : `完全覆盖，共 ${result.count} 个书签`})！`,
+        });
+      } catch (err: any) {
+        setDataActionNotice({
+          type: 'error',
+          message: `HTML 书签导入失败: ${err.message}`,
+        });
+      }
+    };
+
+    if (importStrategy === 'overwrite') {
+      setConfirmModal({
+        isOpen: true,
+        title: '警告：确认要完全覆盖替换当前书签与分类？',
+        message: '【完全覆盖模式】将使用 HTML 书签文件中的数据彻底替换当前所有分类与网址。当前已有数据将被覆盖。',
+        confirmText: '确认覆盖导入',
+        danger: true,
+        action: () => {
+          doImport();
+          setConfirmModal(null);
+        },
+      });
+      return;
+    }
+
+    await doImport();
+  };
+
+  // File Import handler (JSON)
   const handleJsonImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    try {
-      const result = await importConfigJsonWithOptions(file, config, importStrategy);
-      onChange(result.config);
-      setDataActionNotice({
-        type: 'success',
-        message: `JSON 配置导入成功 (${importStrategy === 'merge' ? `增量合并，共添加/更新 ${result.addedCount} 项` : '完全覆盖'})！`,
-      });
-    } catch (err: any) {
-      setDataActionNotice({
-        type: 'error',
-        message: `JSON 导入失败: ${err.message}`,
-      });
-    } finally {
-      e.target.value = '';
-    }
+    await processJsonFile(file);
+    e.target.value = '';
   };
 
   // Browser Bookmarks HTML Import handler
   const handleHtmlImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    try {
-      const result = await importBookmarksHtmlWithOptions(file, config, importStrategy);
-      onChange(result.config);
-      setDataActionNotice({
-        type: 'success',
-        message: `HTML 浏览器书签导入成功 (${importStrategy === 'merge' ? `增量合并，导入 ${result.groupCount} 个分组、${result.count} 个书签` : `完全覆盖，共 ${result.count} 个书签`})！`,
-      });
-    } catch (err: any) {
+    await processHtmlFile(file);
+    e.target.value = '';
+  };
+
+  // Drag and Drop File Drop Handler
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  };
+
+  const handleFileDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith('.json')) {
+      await processJsonFile(file);
+    } else if (fileName.endsWith('.html') || fileName.endsWith('.htm')) {
+      await processHtmlFile(file);
+    } else {
       setDataActionNotice({
         type: 'error',
-        message: `HTML 书签导入失败: ${err.message}`,
+        message: '不支持的文件类型，仅支持上传 .json 配置文件或 .html / .htm 浏览器书签文件。',
       });
-    } finally {
-      e.target.value = '';
     }
   };
 
@@ -553,45 +644,47 @@ export default {
           className="relative w-full max-w-4xl bg-slate-950 border border-white/20 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] text-slate-100"
         >
           {/* Top Bar / Navigation Tabs */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md">
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/10 bg-slate-900/90 backdrop-blur-md gap-3">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <TabButton
                 active={activeTab === 'theme'}
                 onClick={() => setActiveTab('theme')}
-                icon={<Palette size={16} />}
-                label="主题画板 (Palette)"
+                icon={<Palette size={15} />}
+                label="主题画板"
               />
               <TabButton
                 active={activeTab === 'wallpaper'}
                 onClick={() => setActiveTab('wallpaper')}
-                icon={<Wallpaper size={16} />}
-                label="壁纸与背景"
+                icon={<Wallpaper size={15} />}
+                label="壁纸背景"
                 badge={config.theme.useBingWallpaper ? 'BING' : config.theme.wallpaperType ? config.theme.wallpaperType.toUpperCase() : undefined}
               />
               <TabButton
                 active={activeTab === 'sync'}
                 onClick={() => setActiveTab('sync')}
-                icon={<Cloud size={16} />}
-                label="多云实时同步"
+                icon={<Cloud size={15} />}
+                label="多云同步"
                 badge={config.sync.provider !== 'none' ? config.sync.provider.toUpperCase() : undefined}
               />
               <TabButton
                 active={activeTab === 'search'}
                 onClick={() => setActiveTab('search')}
-                icon={<Search size={16} />}
+                icon={<Search size={15} />}
                 label="搜索引擎"
               />
               <TabButton
                 active={activeTab === 'serverless'}
                 onClick={() => setActiveTab('serverless')}
-                icon={<Server size={16} />}
-                label="无服务器部署"
+                icon={<Server size={15} />}
+                label="无服务器"
               />
               <TabButton
                 active={activeTab === 'backup'}
                 onClick={() => setActiveTab('backup')}
-                icon={<Database size={16} />}
+                icon={<Database size={15} className={activeTab === 'backup' ? 'text-white' : 'text-emerald-400'} />}
                 label="数据管理中心"
+                badge="导入/导出"
+                highlight
               />
             </div>
 
@@ -725,7 +818,7 @@ export default {
                         <Palette size={16} className="text-sky-400" />
                         主题模版库 (含原版官方主题与 Palette 调色盘全集)
                       </label>
-                      <span className="text-xs text-slate-400">保留 LyLme Spage 原版经典主题，完整集成 Palette 高颜值风格</span>
+                      <span className="text-xs text-slate-400">保留 LyLme Spage Nav 原版经典主题，完整集成 Palette 高颜值风格</span>
                     </div>
 
                     {/* Category Filter Tabs */}
@@ -1074,7 +1167,7 @@ export default {
                 {/* Custom CSS */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-2">
                   <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                    <span>自定义 CSS 样式注入 (兼容 LyLme Spage 自定义代码)</span>
+                    <span>自定义 CSS 样式注入 (兼容 LyLme Spage Nav 自定义代码)</span>
                   </label>
                   <textarea
                     rows={3}
@@ -2395,21 +2488,69 @@ export default {
 
                 {/* Import Cards */}
                 <div>
-                  <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5 px-1">
-                    数据一键还原与导入 (Import & Restore)
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between mb-2.5 px-1">
+                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      数据一键还原与导入 (Import & Restore)
+                    </h4>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-md font-semibold border ${
+                      importStrategy === 'merge'
+                        ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                        : 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+                    }`}>
+                      当前策略：{importStrategy === 'merge' ? '增量合并去重' : '完全覆盖替换'}
+                    </span>
+                  </div>
+                  <div className="space-y-4">
+                    {/* Drag and Drop Zone for JSON or HTML Bookmark files */}
+                    <div
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleFileDrop}
+                      className={`relative p-5 rounded-2xl border-2 border-dashed transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer ${
+                        isDraggingOver
+                          ? 'border-blue-400 bg-blue-500/20 text-blue-200 scale-[1.01]'
+                          : 'border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/30 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300">
+                          <Upload size={18} />
+                        </div>
+                        <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300">
+                          <Bookmark size={18} />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-bold text-white">
+                          {isDraggingOver
+                            ? '松开鼠标即可按当前策略解析导入文件'
+                            : '拖拽 HTML 书签文件 (.html / .htm) 或 JSON 配置文件 (.json) 到此处'}
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          系统将根据当前选择的 <strong className="text-blue-300">{importStrategy === 'merge' ? '【增量合并去重】' : '【完全覆盖替换】'}</strong> 策略自动识别并处理
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* JSON Import */}
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-emerald-400">
-                        <Upload size={18} />
-                        <h5 className="text-xs font-bold text-white">从 JSON 文件还原数据</h5>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-emerald-400">
+                          <Upload size={18} />
+                          <h5 className="text-xs font-bold text-white">从 JSON 文件还原数据</h5>
+                        </div>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                          importStrategy === 'merge' ? 'bg-blue-500/20 text-blue-300' : 'bg-rose-500/20 text-rose-300'
+                        }`}>
+                          {importStrategy === 'merge' ? '增量导入' : '覆盖导入'}
+                        </span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-relaxed">
-                        支持导入之前导出的 JSON 配置文件，支持按上方策略进行增量合并或完全覆盖。
+                        支持导入之前导出的 JSON 配置文件，将按照上方设置的<strong className="text-slate-200 font-medium">{importStrategy === 'merge' ? '增量合并' : '完全覆盖'}</strong>策略恢复数据。
                       </p>
                       <label className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-white/15">
-                        <Upload size={14} /> 选择本地 JSON 文件还原
+                        <Upload size={14} /> 选择本地 JSON 文件还原 ({importStrategy === 'merge' ? '增量' : '覆盖'})
                         <input
                           type="file"
                           accept=".json"
@@ -2421,15 +2562,22 @@ export default {
 
                     {/* HTML Bookmark Import */}
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-amber-400">
-                        <FileCode size={18} />
-                        <h5 className="text-xs font-bold text-white">从浏览器 HTML 书签导入</h5>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-amber-400">
+                          <FileCode size={18} />
+                          <h5 className="text-xs font-bold text-white">从浏览器 HTML 书签导入</h5>
+                        </div>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                          importStrategy === 'merge' ? 'bg-blue-500/20 text-blue-300' : 'bg-rose-500/20 text-rose-300'
+                        }`}>
+                          {importStrategy === 'merge' ? '增量导入' : '覆盖导入'}
+                        </span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-relaxed">
-                        支持 Chrome、Edge、Firefox 导出的书签 HTML，自动解析文件夹层级结构并批量创建网址。
+                        支持 Chrome、Edge、Firefox 导出的 HTML 书签文件，将按<strong className="text-slate-200 font-medium">{importStrategy === 'merge' ? '增量合并' : '完全覆盖'}</strong>模式导入书签与分类。
                       </p>
                       <label className="w-full py-2.5 bg-amber-600/30 hover:bg-amber-600/50 text-amber-100 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-amber-500/30">
-                        <Bookmark size={14} /> 选择浏览器 HTML 书签文件
+                        <Bookmark size={14} /> 选择浏览器 HTML 书签文件 ({importStrategy === 'merge' ? '增量' : '覆盖'})
                         <input
                           type="file"
                           accept=".html,.htm"
@@ -2440,6 +2588,7 @@ export default {
                     </div>
                   </div>
                 </div>
+              </div>
 
                 {/* Dangerous Operations Area */}
                 <div>
@@ -2490,43 +2639,17 @@ export default {
           </div>
 
           {/* Secondary Confirmation Modal for Destructive Actions */}
-          <AnimatePresence>
-            {confirmModal && confirmModal.isOpen && (
-              <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.92 }}
-                  className="bg-slate-900 border border-rose-500/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-center"
-                >
-                  <div className="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 mx-auto flex items-center justify-center">
-                    <ShieldAlert size={26} />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-base font-bold text-white">{confirmModal.title}</h3>
-                    <p className="text-xs text-slate-300 leading-relaxed">{confirmModal.message}</p>
-                  </div>
-                  <div className="flex items-center justify-center gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setConfirmModal(null)}
-                      className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors"
-                    >
-                      取消返回
-                    </button>
-                    <button
-                      type="button"
-                      onClick={confirmModal.action}
-                      className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-rose-600/30 transition-colors flex items-center gap-1.5"
-                    >
-                      <Trash2 size={13} />
-                      {confirmModal.confirmText}
-                    </button>
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
+          <ConfirmModal
+            isOpen={!!confirmModal?.isOpen}
+            title={confirmModal?.title || ''}
+            message={confirmModal?.message || ''}
+            confirmText={confirmModal?.confirmText || '确认继续'}
+            danger={confirmModal?.danger ?? true}
+            onConfirm={() => {
+              if (confirmModal?.action) confirmModal.action();
+            }}
+            onCancel={() => setConfirmModal(null)}
+          />
 
           {/* Export Authentication Modal */}
           <ExportAuthModal
@@ -2554,27 +2677,39 @@ function TabButton({
   icon,
   label,
   badge,
+  highlight,
 }: {
   active: boolean;
   onClick: () => void;
   icon: React.ReactNode;
   label: string;
   badge?: string;
+  highlight?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 ${
+      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 ${
         active
-          ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-          : 'text-slate-400 hover:text-white hover:bg-white/10'
+          ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-1 ring-blue-400/50'
+          : highlight
+          ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 border border-emerald-500/30'
+          : 'text-slate-300 hover:text-white hover:bg-white/10'
       }`}
     >
       {icon}
       <span>{label}</span>
       {badge && (
-        <span className="text-[9px] bg-white/20 text-white px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+        <span
+          className={`text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider font-mono ${
+            active
+              ? 'bg-white/20 text-white'
+              : highlight
+              ? 'bg-emerald-400/20 text-emerald-200'
+              : 'bg-white/10 text-slate-300'
+          }`}
+        >
           {badge}
         </span>
       )}
