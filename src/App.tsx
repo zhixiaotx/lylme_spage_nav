@@ -590,27 +590,17 @@ export default function App() {
       {/* Minimal Footer */}
       <footer className="relative z-20 w-full py-6 text-center select-none mt-auto">
         <div className={`max-w-4xl mx-auto px-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs opacity-65 ${currentThemeMeta.textClass}`}>
-          {/* 开发者信息 */}
+          {/* 项目与开源信息 */}
           <span>
-            基于{' '}
             <a
-              href="https://github.com/LyLme/lylme_spage"
+              href="https://github.com/zhixiaotx/lylme_spage_nav"
               target="_blank"
               rel="noreferrer"
-              className="hover:underline font-medium"
+              className="hover:underline font-medium inline-flex items-center gap-1.5"
             >
-              LyLme Spage
-            </a>{' '}
-            &{' '}
-            <a
-              href="https://github.com/litxiaoxi/LyLme-Spage-Palette"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:underline font-medium"
-            >
-              Palette
-            </a>{' '}
-            设计开发
+              <span>六零导航页</span>
+              <span className="opacity-80 font-mono text-[11px]">(zhixiaotx/lylme_spage_nav)</span>
+            </a>
           </span>
 
           {/* 可选 ICP 备案号 */}

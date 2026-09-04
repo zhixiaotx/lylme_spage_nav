@@ -1,6 +1,6 @@
 # 🌟 六零导航页 - LyLme Spage (Palette 增强版)
 
-> 基于 **LyLme Spage**：https://github.com/LyLme/lylme_spage 与 **Palette**：https://github.com/litxiaoxi/LyLme-Spage-Palette 深度重构与二次开发的现代化高颜值无服务器导航起始页。 
+> 基于 **LyLme Spage**：https://github.com/LyLme/lylme_spage 与 **Palette**：https://github.com/litxiaoxi/LyLme-Spage-Palette 深度重构与二次开发的现代化高颜值无服务器导航起始页。  
 > 纯前端静态 + 云端边缘函数架构，支持海量书签无感秒开、日夜模式无缝切换、多级子目录分类、以及 Cloudflare KV / D1 / GitHub Gist / GitHub 仓库 / WebDAV (坚果云) 全平台云端实时同步。
 
 ---
@@ -340,6 +340,7 @@ Cloudflare Pages 提供全球顶级 Anycast CDN 加速，并且免费支持 Func
 
 ---
 
-## 📄 开源许可证
+## 📄 开源许可证与仓库
 
-本项目采用 [MIT License](https://opensource.org/licenses/MIT) 开源。欢迎 Star、Fork 与提交 Pull Request！
+- **GitHub 仓库**：[zhixiaotx/lylme_spage_nav](https://github.com/zhixiaotx/lylme_spage_nav)
+- **开源协议**：本项目采用 [MIT License](https://opensource.org/licenses/MIT) 开源。欢迎 Star、Fork 与提交 Issue / PR！
