@@ -38,14 +38,13 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
   actionTitle = '多云同步操作',
   initialUsername,
 }) => {
-  const [username, setUsername] = useState('admin');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   const adminUser = getExpectedAdminUser();
-  const adminPass = getExpectedAdminPass();
   const isCustomEnv = hasCustomEnvCredentials();
 
   useEffect(() => {
@@ -57,12 +56,6 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
       setSuccessMsg('');
     }
   }, [isOpen, initialUsername, adminUser]);
-
-  const handleQuickFillAdmin = () => {
-    setUsername(adminUser);
-    setPassword(adminPass);
-    setErrorMsg('');
-  };
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,19 +141,9 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
 
               {/* Username Input */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-slate-300">
-                    同步账号 (仅能读写自个数据)
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleQuickFillAdmin}
-                    className="text-[11px] text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1"
-                  >
-                    <KeyRound size={12} />
-                    填入默认 admin 账号
-                  </button>
-                </div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  同步账号 (仅能读写自个数据)
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <User size={16} />
@@ -171,7 +154,7 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="输入 admin 或自定义专属账号"
+                    placeholder="请输入账号名称"
                     className="w-full pl-10 pr-3.5 py-2.5 bg-slate-800/80 border border-white/15 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
                   />
                 </div>
@@ -180,7 +163,7 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
               {/* Password Input */}
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  安全密码 (默认: 123456)
+                  安全密码
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -192,7 +175,7 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="请输入该账号的访问密码"
+                    placeholder="请输入该账号的安全密码"
                     className="w-full pl-10 pr-10 py-2.5 bg-slate-800/80 border border-white/15 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
                   />
                   <button
@@ -217,8 +200,7 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
                   </span>
                 </div>
                 <p className="leading-relaxed">
-                  默认账号为 <code className="text-amber-300 bg-black/40 px-1 py-0.5 rounded font-mono">admin</code>，密码为 <code className="text-amber-300 bg-black/40 px-1 py-0.5 rounded font-mono">123456</code>。
-                  输入未注册账号将自动创建新独立空间。各账号的本地配置与云端记录严格隔离，互不可见且互不干扰。
+                  请输入正确的账号与安全密码进行身份认证。首次输入未注册账号将自动创建专属独立空间。各账号的本地配置与云端记录严格物理隔离，互不可见且互不干扰。
                 </p>
               </div>
 

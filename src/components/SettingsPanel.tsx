@@ -1669,7 +1669,7 @@ export default {
                           )}
                         </div>
                         <p className="text-[11px] text-slate-400 mt-0.5">
-                          一个账号只能读取自个的数据，不能读取其他账号的数据（默认: admin / 123456）
+                          各账号数据严格物理隔离，仅能读写当前已验证账号的数据
                         </p>
                       </div>
                     </div>
@@ -2702,7 +2702,7 @@ export default {
                       <span>🛡️ 数据导出安全权限说明</span>
                     </div>
                     <p className="text-[11px] text-slate-400 leading-relaxed">
-                      为防止未授权访客下载您的全量书签与配置数据，导出操作已受到凭证保护。默认账号为 <code className="text-amber-300 bg-black/40 px-1 py-0.5 rounded font-mono">admin</code>，初始密码为 <code className="text-amber-300 bg-black/40 px-1 py-0.5 rounded font-mono">123456</code>。
+                      为防止未授权访客下载您的全量书签与配置数据，导出全站数据需验证管理员安全凭证。
                     </p>
                     <p className="text-[11px] text-slate-400 leading-relaxed">
                       <strong>如何自定义凭据：</strong>您可在环境变量文件（如 <code className="text-sky-300 bg-black/40 px-1 py-0.5 rounded font-mono">.env</code>）中配置 <code className="text-sky-300 bg-black/40 px-1 py-0.5 rounded font-mono">VITE_EXPORT_ADMIN_USER</code> 与 <code className="text-sky-300 bg-black/40 px-1 py-0.5 rounded font-mono">VITE_EXPORT_ADMIN_PASS</code>，账号密码不会在前端代码中明文显示。

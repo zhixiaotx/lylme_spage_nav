@@ -319,7 +319,7 @@ export default function App() {
       return {
         success: false,
         requireAuth: true,
-        message: `多云同步需先验证账号权限（当前账号: ${activeUser}，默认密码 123456）`,
+        message: `多云同步需先验证账号权限（当前账号: ${activeUser}）`,
       };
     }
 
