@@ -25,21 +25,38 @@ export const MusicPlayerLoader: React.FC = () => {
       console.error(e);
     }
 
-    // Mark as loaded globally
-    (window as any).myhkLoaded = true;
+    // Function to load music player script
+    const loadPlayer = () => {
+      if (document.getElementById('myhk') || (window as any).myhkLoaded) return;
+      (window as any).myhkLoaded = true;
 
-    const script = document.createElement('script');
-    script.id = 'myhk';
-    script.src = 'https://myhkw.cn/api/player/178355703190';
-    script.setAttribute('key', '178355703190');
-    script.setAttribute('m', '1');
-    script.async = true;
+      const script = document.createElement('script');
+      script.id = 'myhk';
+      script.src = 'https://myhkw.cn/api/player/178355703190';
+      script.setAttribute('key', '178355703190');
+      script.setAttribute('m', '1');
+      script.async = true;
 
-    script.onerror = () => {
-      console.warn('Music player script failed to load.');
+      script.onerror = () => {
+        console.warn('Music player script failed to load.');
+      };
+
+      document.body.appendChild(script);
     };
 
-    document.body.appendChild(script);
+    // Check if jQuery is ready, otherwise poll briefly
+    if ((window as any).jQuery || (window as any).$) {
+      loadPlayer();
+    } else {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if ((window as any).jQuery || (window as any).$ || attempts > 20) {
+          clearInterval(interval);
+          loadPlayer();
+        }
+      }, 100);
+    }
   }, []);
 
   return null;
