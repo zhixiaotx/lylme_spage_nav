@@ -148,6 +148,51 @@ export const mergeWithDefaults = (stored: Partial<AppConfig>): AppConfig => {
   };
 };
 
+/**
+ * Smart merge local and remote configurations during cloud sync to prevent multi-device data loss.
+ * Combines groups/bookmarks incrementally (union without overwriting/deleting unique items from either device).
+ */
+export const smartMergeConfigs = (local: AppConfig, remote: any): AppConfig => {
+  const remoteParsed = mergeWithDefaults(remote);
+
+  // 1. Smart merge bookmark groups and items incrementally (Union, preserves all unique local and remote bookmarks)
+  const { mergedGroups } = mergeGroupsIncrementally(local.groups, remoteParsed.groups || []);
+
+  // 2. Merge search engines
+  const existingEngineIds = new Set(local.searchEngines.map((e) => e.id || e.value));
+  const newEngines = (remoteParsed.searchEngines || []).filter((e: any) => !existingEngineIds.has(e.id || e.value));
+  const mergedEngines = [...local.searchEngines, ...newEngines];
+
+  return {
+    ...remoteParsed,
+    ...local, // Retain local settings/credentials (tokens, API keys, etc.)
+    searchEngines: mergedEngines,
+    groups: mergedGroups,
+    theme: {
+      ...remoteParsed.theme,
+      ...(local.theme || {}),
+    },
+    title: remoteParsed.title !== DEFAULT_CONFIG.title ? remoteParsed.title : local.title,
+    subtitle: remoteParsed.subtitle || local.subtitle,
+    description: remoteParsed.description || local.description,
+    icp: remoteParsed.icp || local.icp,
+    sync: {
+      ...local.sync,
+      ...(remoteParsed.sync || {}),
+      provider: local.sync.provider,
+      gist: local.sync.gist,
+      githubRepo: local.sync.githubRepo,
+      webdav: local.sync.webdav,
+      cfKv: local.sync.cfKv,
+      cfD1: local.sync.cfD1,
+      customApi: local.sync.customApi,
+      lastSyncedAt: Date.now(),
+      lastStatus: 'success',
+      lastMessage: '云端多端同步智能合并成功（防丢失）',
+    },
+  };
+};
+
 /* =========================================================================
    1. GitHub Gist Synchronization
    ========================================================================= */
@@ -178,12 +223,10 @@ export const pullFromGist = async (config: AppConfig): Promise<SyncResult> => {
     }
 
     const remoteConfig = JSON.parse(file.content);
-    const merged = mergeWithDefaults(remoteConfig);
-    // Keep local credentials intact
-    merged.sync = { ...config.sync, lastSyncedAt: Date.now(), lastStatus: 'success', lastMessage: 'Gist 同步成功' };
+    const merged = smartMergeConfigs(config, remoteConfig);
 
     saveConfig(merged);
-    return { success: true, message: '从 GitHub Gist 同步成功', config: merged };
+    return { success: true, message: '从 GitHub Gist 智能合并同步成功', config: merged };
   } catch (error: any) {
     return { success: false, message: `Gist 拉取异常: ${error.message || error}` };
   }
@@ -307,24 +350,24 @@ export const pullFromGithubRepo = async (config: AppConfig): Promise<SyncResult>
 
     const decodedContent = base64ToUtf8(data.content);
     const remoteConfig = JSON.parse(decodedContent);
-    const merged = mergeWithDefaults(remoteConfig);
+    const merged = smartMergeConfigs(config, remoteConfig);
     
     // Update local state with latest sha
     merged.sync = {
-      ...config.sync,
+      ...merged.sync,
       githubRepo: {
         ...config.sync.githubRepo,
         sha: data.sha,
       },
       lastSyncedAt: Date.now(),
       lastStatus: 'success',
-      lastMessage: `从 GitHub 仓库 ${owner}/${repo} 同步成功`,
+      lastMessage: `从 GitHub 仓库 ${owner}/${repo} 智能同步成功`,
     };
 
     saveConfig(merged);
     return {
       success: true,
-      message: `从 GitHub 独立仓库 (${owner}/${repo}/${cleanPath}) 同步成功`,
+      message: `从 GitHub 独立仓库 (${owner}/${repo}/${cleanPath}) 智能合并同步成功`,
       config: merged,
     };
   } catch (error: any) {
@@ -450,18 +493,12 @@ export const pullFromWebdav = async (config: AppConfig): Promise<SyncResult> => 
     }
 
     const remoteConfig = JSON.parse(content);
-    const merged = mergeWithDefaults(remoteConfig);
-    merged.sync = {
-      ...config.sync,
-      lastSyncedAt: Date.now(),
-      lastStatus: 'success',
-      lastMessage: 'WebDAV 同步成功',
-    };
+    const merged = smartMergeConfigs(config, remoteConfig);
 
     saveConfig(merged);
     return {
       success: true,
-      message: `从 WebDAV 服务器 (${cleanFilename}) 同步成功`,
+      message: `从 WebDAV 服务器 (${cleanFilename}) 智能合并同步成功`,
       config: merged,
     };
   } catch (error: any) {
@@ -539,15 +576,9 @@ export const pullFromCfKv = async (config: AppConfig): Promise<SyncResult> => {
       const content = await edgeRes.text();
       if (content && content.trim()) {
         const remoteConfig = JSON.parse(content);
-        const merged = mergeWithDefaults(remoteConfig);
-        merged.sync = {
-          ...config.sync,
-          lastSyncedAt: Date.now(),
-          lastStatus: 'success',
-          lastMessage: '通过 Cloudflare Pages 边缘后端 (/api/sync) 同步成功 (免凭证模式)',
-        };
+        const merged = smartMergeConfigs(config, remoteConfig);
         saveConfig(merged);
-        return { success: true, message: '通过 Cloudflare 边缘接口 (/api/sync) 读取成功 (免 CORS)', config: merged };
+        return { success: true, message: '通过 Cloudflare 边缘接口 (/api/sync) 智能合并同步成功 (免 CORS)', config: merged };
       }
     }
   } catch {
@@ -592,11 +623,10 @@ export const pullFromCfKv = async (config: AppConfig): Promise<SyncResult> => {
     if (!content) return { success: false, message: 'Cloudflare KV 键值为空' };
 
     const remoteConfig = JSON.parse(content);
-    const merged = mergeWithDefaults(remoteConfig);
-    merged.sync = { ...config.sync, lastSyncedAt: Date.now(), lastStatus: 'success', lastMessage: 'Cloudflare KV 同步成功' };
+    const merged = smartMergeConfigs(config, remoteConfig);
 
     saveConfig(merged);
-    return { success: true, message: '从 Cloudflare KV 同步成功', config: merged };
+    return { success: true, message: '从 Cloudflare KV 智能合并同步成功', config: merged };
   } catch (error: any) {
     return { success: false, message: `Cloudflare KV 拉取错误: ${error.message || error}` };
   }
@@ -737,15 +767,9 @@ export const pullFromCfD1 = async (config: AppConfig): Promise<SyncResult> => {
       const content = await edgeRes.text();
       if (content && content.trim()) {
         const remoteConfig = JSON.parse(content);
-        const merged = mergeWithDefaults(remoteConfig);
-        merged.sync = {
-          ...config.sync,
-          lastSyncedAt: Date.now(),
-          lastStatus: 'success',
-          lastMessage: '通过 Cloudflare Pages 边缘 D1 (/api/sync) 同步成功 (免凭证模式)',
-        };
+        const merged = smartMergeConfigs(config, remoteConfig);
         saveConfig(merged);
-        return { success: true, message: '成功从 Cloudflare D1 边缘接口拉取最新配置', config: merged };
+        return { success: true, message: '成功从 Cloudflare D1 边缘接口智能合并同步最新配置', config: merged };
       }
     }
   } catch {
@@ -795,11 +819,10 @@ export const pullFromCfD1 = async (config: AppConfig): Promise<SyncResult> => {
     }
 
     const remoteConfig = JSON.parse(row.value);
-    const merged = mergeWithDefaults(remoteConfig);
-    merged.sync = { ...config.sync, lastSyncedAt: Date.now(), lastStatus: 'success', lastMessage: 'Cloudflare D1 同步成功' };
+    const merged = smartMergeConfigs(config, remoteConfig);
 
     saveConfig(merged);
-    return { success: true, message: '成功从 Cloudflare D1 拉取最新配置', config: merged };
+    return { success: true, message: '成功从 Cloudflare D1 智能合并拉取最新配置', config: merged };
   } catch (error: any) {
     return { success: false, message: `D1 拉取异常: ${error.message || error}` };
   }
@@ -891,11 +914,10 @@ export const pullFromCustomApi = async (config: AppConfig): Promise<SyncResult> 
     if (!res.ok) return { success: false, message: `云端接口响应异常: HTTP ${res.status}` };
 
     const data = await res.json();
-    const merged = mergeWithDefaults(data);
-    merged.sync = { ...config.sync, lastSyncedAt: Date.now(), lastStatus: 'success', lastMessage: '云端 API 同步成功' };
+    const merged = smartMergeConfigs(config, data);
     saveConfig(merged);
 
-    return { success: true, message: '从云端数据库同步成功', config: merged };
+    return { success: true, message: '从云端数据库智能合并同步成功', config: merged };
   } catch (err: any) {
     return { success: false, message: `自定义 API 请求失败: ${err.message || err}` };
   }
