@@ -42,7 +42,7 @@ export const sanitizeGroups = (groups: any[]): any[] => {
   });
 };
 
-const STORAGE_KEY = 'lylme_spage_config_v2';
+const STORAGE_KEY = 'lylme_spage_config_v3';
 
 export interface SyncResult {
   success: boolean;
@@ -57,12 +57,12 @@ export const loadConfig = (): AppConfig => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      // Check legacy key
-      const legacy = localStorage.getItem('lylme_spage_config');
-      if (legacy) {
-        const parsed = JSON.parse(legacy);
-        return mergeWithDefaults(parsed);
-      }
+      // Clean up previous test storage and initialize with pure pristine default config
+      try {
+        localStorage.removeItem('lylme_spage_config');
+        localStorage.removeItem('lylme_spage_config_v2');
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CONFIG));
+      } catch {}
       return DEFAULT_CONFIG;
     }
     const parsed = JSON.parse(stored);
@@ -1184,6 +1184,10 @@ export const clearAllBookmarks = (currentConfig: AppConfig): AppConfig => {
  * Reset all configurations and bookmarks to initial factory defaults
  */
 export const restoreFactoryDefaults = (): AppConfig => {
+  try {
+    localStorage.removeItem('lylme_spage_config');
+    localStorage.removeItem('lylme_spage_config_v2');
+  } catch {}
   saveConfig(DEFAULT_CONFIG);
   return DEFAULT_CONFIG;
 };
