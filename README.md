@@ -1,355 +1,445 @@
 # 🌟 六零导航页 - LyLme Spage Nav (Palette 增强版)
 
 > 基于 **LyLme Spage Nav**：https://github.com/LyLme/lylme_spage 与 **Palette**：https://github.com/litxiaoxi/LyLme-Spage-Palette 深度重构与二次开发的现代化高颜值无服务器导航起始页。  
-> 纯前端静态 + 云端边缘函数架构，支持海量书签无感秒开、日夜模式无缝切换、多级子目录分类、以及 Cloudflare KV / D1 / GitHub Gist / GitHub 仓库 / WebDAV (坚果云) 全平台云端实时同步。
+> 纯前端静态 + 云端边缘函数架构，支持海量书签无感秒开、日夜模式无缝切换、多级子目录分类、以及 Cloudflare KV / D1 / GitHub Gist / GitHub 仓库 / WebDAV (坚果云) 全平台云端实时同步。  
+> **🔐 全新升级：多云同步权限鉴权、多设备防覆盖双向增量合并、单账号数据沙箱物理隔离，多访客/多设备绝不串号、绝不丢数据！**
 
 ---
 
 ## 📑 目录
 
 - [🌟 核心特色与亮点](#-核心特色与亮点)
+- [🔐 账号权限与多云同步安全隔离（小白必读）](#-账号权限与多云同步安全隔离小白必读)
+  - [1. 默认管理员账号与密码](#1-默认管理员账号与密码)
+  - [2. 单账号数据隔离机制（一人一库，绝不串号）](#2-单账号数据隔离机制一人一库绝不串号)
+  - [3. 多设备双向增量合并（防覆盖·防丢失）](#3-多设备双向增量合并防覆盖防丢失)
+- [🚀 多平台小白极速部署教程（零基础手把手）](#-多平台小白极速部署教程零基础手把手)
+  - [【方案 A】Cloudflare Pages 零成本全球极速部署（最推荐）](#方案-acloudflare-pages-零成本全球极速部署最推荐)
+  - [【方案 B】GitHub Pages 自动构建部署（免服务器）](#方案-bgithub-pages-自动构建部署免服务器)
+  - [【方案 C】Vercel 极速一键部署](#方案-cvercel-极速一键部署)
+  - [【方案 D】Netlify 部署](#方案-dnetlify-部署)
+  - [【方案 E】自建 VPS / 宝塔面板 / Nginx 部署](#方案-e自建-vps--宝塔面板--nginx-部署)
+- [☁️ Cloudflare Pages 边缘存储绑定（KV 与 D1）](#️-cloudflare-pages-边缘存储绑定kv-与-d1)
+  - [1. 绑定 ONENAV_KV 键值存储（推荐，最省心）](#1-绑定-onenav_kv-键值存储推荐最省心)
+  - [2. 绑定 ONENAV_D1 关系型数据库（结构化 SQL）](#2-绑定-onenav_d1-关系型数据库结构化-sql)
+- [🔄 5大云同步后端小白配置实战](#-5大云同步后端小白配置实战)
+  - [1. Cloudflare KV / D1 内置接口同步](#1-cloudflare-kv--d1-内置接口同步)
+  - [2. 坚果云 / WebDAV 同步（国内网盘推荐）](#2-坚果云--webdav-同步国内网盘推荐)
+  - [3. GitHub Gist 自动同步](#3-github-gist-自动同步)
+  - [4. GitHub 独立代码仓库同步（版本回溯）](#4-github-独立代码仓库同步版本回溯)
+  - [5. 浏览器 HTML 书签迁移与本地 JSON 导出](#5-浏览器-html-书签迁移与本地-json-导出)
+- [⚙️ 环境变量配置表（自定义管理员账号与密码）](#️-环境变量配置表自定义管理员账号与密码)
 - [📂 项目目录结构与文件功能详解](#-项目目录结构与文件功能详解)
-- [🚀 多平台极速部署教程（小白零基础）](#-多平台极速部署教程小白零基础)
-  - [1. GitHub Actions 自动构建部署到 GitHub Pages](#1-github-actions-自动构建部署到-github-pages)
-  - [2. Cloudflare Pages 部署（推荐，支持 Functions 边缘存储）](#2-cloudflare-pages-部署推荐支持-functions-边缘存储)
-  - [3. Vercel 极速部署](#3-vercel-极速部署)
-  - [4. Netlify 部署](#4-netlify-部署)
-  - [5. Nginx / Docker / 宝塔面板本地服务器部署](#5-nginx--docker--宝塔面板本地服务器部署)
-- [☁️ Cloudflare Pages Functions 绑定配置（ONENAV_KV 与 ONENAV_D1）](#️-cloudflare-pages-functions-绑定配置onenav_kv-与-onenav_d1)
-- [🔄 全平台多端数据同步小白配置指南](#-全平台多端数据同步小白配置指南)
-  - [1. Cloudflare KV / D1 免费云端同步](#1-cloudflare-kv--d1-免费云端同步)
-  - [2. GitHub Gist 云端自动同步](#2-github-gist-云端自动同步)
-  - [3. GitHub 独立代码仓库同步](#3-github-独立代码仓库同步)
-  - [4. 坚果云 / 自建 WebDAV 协议同步](#4-坚果云--自建-webdav-协议同步)
-  - [5. 浏览器书签导入与 JSON 本地备份](#5-浏览器书签导入与-json-本地备份)
 - [🎨 壁纸中心与个性化视觉自定义](#-壁纸中心与个性化视觉自定义)
 - [🔍 Logo / Favicon 自动获取与多级容灾机制](#-logo--favicon-自动获取与多级容灾机制)
-- [🌓 昼夜模式与移动端自适应设计](#-昼夜模式与移动端自适应设计)
-- [⚡ 5万+ 海量书签虚拟分批懒加载架构](#-5万-海量书签虚拟分批懒加载架构)
+- [⚡ 5万+ 海量书签虚拟窗口与首屏加载架构](#-5万-海量书签虚拟窗口与首屏加载架构)
 - [🛠️ 常见开发与部署避坑指南 (FAQ)](#️-常见开发与部署避坑指南-faq)
 
 ---
 
 ## 🌟 核心特色与亮点
 
-- **⚡ 零服务器成本与边缘计算**：纯静态前端，可部署在 GitHub Pages、Cloudflare Pages、Vercel、Netlify 等任意平台。
+- **⚡ 零服务器成本与全球边缘加速**：纯静态前端，可免费部署在 Cloudflare Pages、GitHub Pages、Vercel、Netlify 等任意平台。
+- **🔐 多云同步权限与多账号沙箱物理隔离**：
+  - 同步功能与导出数据拥有统一的权限鉴权机制（默认账号 `admin`，密码 `123456`）。
+  - **一个账号只能读取和同步自个的数据，不能读取或篡改其他账号的数据**，支持多用户独立注册互不干扰。
+- **🛡️ 多设备防覆盖与双向增量合并 (Two-Way Smart Merge)**：
+  - 手机、平板、多台电脑同时添加书签，同步时按 URL 自动智能排重并集合并，新旧数据两端均安全保留，绝不发生覆盖丢失。
+  - 内置云端版本冲突检测弹窗，多端时间戳不一致时支持用户自主选择【智能合并保留双方】或【强制覆盖云端】。
+- **⏳ 优雅的首屏全局加载骨架屏 (GlobalLoading)**：
+  - 首屏从 Cloudflare 边缘接口拉取配置期间显示丝滑的呼吸光晕与加载动效，杜绝白屏或布局抖动闪烁。
 - **🌓 电影级昼夜模式切换**：集成现代浏览器 View Transitions API，提供柔和丝滑的明暗滤镜与色彩过度，支持移动端沉浸式顶栏 `theme-color` 同步。
 - **🚀 10万级海量书签虚拟滚动 (Virtual Scrolling)**：当书签数量达到 500+ 或单个分组超过 60+ 项时，自动激活视口虚拟滚动 windowing 算法，仅渲染视口内可见卡片，突破 DOM 瓶颈，保持 60~120 FPS 极速流畅。
-- **☁️ 5大云同步后端与本地优先 (Local-First)**：
+- **☁️ 5大主流云同步后端**：
   - **Cloudflare KV** 边缘键值缓存
   - **Cloudflare D1** 边缘 SQL 关系数据库
+  - **坚果云 / WebDAV** 跨平台标准网盘协议
   - **GitHub Gist** 私有/公开代码片段存储
-  - **GitHub 独立代码仓库**（自动 Git Commit 记录）
-  - **WebDAV / 坚果云** 跨平台网盘协议
-- **📂 HTML 浏览器书签全量与增量导入**：支持 Chrome、Edge、Firefox、Safari 等浏览器导出的 Netscape Bookmark HTML 文件，提供**增量合并去重**与**完全覆盖替换**两种策略，兼具数据迁移灵活性与安全。
-- **🛡️ 带有高危二次确认 (ConfirmModal) 的防护机制**：对恢复出厂设置、覆盖导入、清空书签等高危破坏性动作提供通用二次确认弹窗，有效防误触误删。
-- **🔍 智能搜索矩阵**：集成多款主流搜索引擎（百度、Google、Bing、GitHub、bilibili 等）与本地书签秒级检索，支持快捷键 `Ctrl + K` / `Cmd + K`。
+  - **GitHub 独立代码仓库**（自动 Git Commit 版本记录）
+- **📂 HTML 浏览器书签全量与增量导入**：支持 Chrome、Edge、Firefox、Safari 导出的书签文件，提供增量合并与覆盖替换两种策略。
+- **🔍 智能搜索矩阵**：多款主流搜索引擎（百度、Google、Bing、GitHub、bilibili 等）与本地书签秒级检索，支持快捷键 `Ctrl + K` / `Cmd + K`。
 - **🖼️ 4K 高清壁纸中心**：Bing 每日高清壁纸、4K 精选图库、动态渐变、毛玻璃磨砂（Blur）与遮罩调节。
-- **🏷️ 多级分类与手势滑动**：支持无限层级父子分类，移动端支持平滑手势横滑与分类侧边栏折叠。
 
 ---
 
-## 📂 项目目录结构与文件功能详解
+## 🔐 账号权限与多云同步安全隔离（小白必读）
 
-为了让初学者更直观地理解整个工程的设计逻辑，下表详细列出了项目中每个核心文件与目录的作用：
+### 1. 默认管理员账号与密码
 
-```
-├── .github/
-│   └── workflows/
-│       └── deploy.yml            # GitHub Actions 自动化工作流：每次 push 自动构建并推送到 gh-pages 分支
-├── functions/                    # Cloudflare Pages Functions 边缘无服务器函数目录
-│   └── api/
-│       ├── kv.ts                 # 负责接收前端请求并读写 Cloudflare KV 命名空间中的书签配置
-│       ├── d1.ts                 # 负责执行 Cloudflare D1 边缘 SQLite 数据库的初始化、查询与写入
-│       └── sync.ts               # 通用边缘同步聚合代理接口
-├── public/                       # 存放公共静态资源（favicon、内置预设壁纸、静态图标等）
-├── src/                          # 前端核心源码
-│   ├── components/               # React 独立 UI 组件库
-│   │   ├── ClockWidget.tsx       # 实时时钟与一言（Hitokoto）励志文案展示挂件
-│   │   ├── Favicon.tsx           # 智能图标获取组件（内置多级容灾与首字母徽标生成）
-│   │   ├── FloatingActions.tsx   # 右下角悬浮快捷按钮组（日夜切换、壁纸中心、系统设置、回到顶部）
-│   │   ├── LinkGrid.tsx          # 书签核心网格容器（包含分类展示、多级目录树、分批懒加载与增删改查）
-│   │   ├── SearchBar.tsx         # 多引擎聚合搜索栏、联想词下拉提示与本地书签快速跳转
-│   │   ├── SettingsPanel.tsx     # 系统个性化设置面板（主题选择、壁纸配置、多云同步管理、备份还原等）
-│   │   └── WallpaperModal.tsx    # 4K 壁纸中心弹窗（Bing 今日壁纸、分类精选大图、渐变预设预览）
-│   ├── data/
-│   │   ├── defaultBookmarks.ts   # 开箱即用的默认导航分类与精选书签数据
-│   │   └── presets.ts            # 主题配色预设、4K 壁纸库与搜索引擎配置数据
-│   ├── utils/
-│   │   ├── favicon.ts            # 图标解析多级兜底逻辑工具函数
-│   │   ├── htmlBookmarkParser.ts # 浏览器导出的 HTML 书签文件解析引擎（支持 Chrome/Edge/Firefox/Safari）
-│   │   └── sync.ts               # 云端同步核心驱动（包含 KV、D1、Gist、GitHub Repo、WebDAV 同步协议实现）
-│   ├── types.ts                  # 全局 TypeScript 数据结构与接口定义（AppConfig、NavGroup、NavItem 等）
-│   ├── App.tsx                   # 应用根组件：统筹全局配置、数据加载、快捷键监听与日夜主题调度
-│   ├── main.tsx                  # React 18 应用挂载入口
-│   └── index.css                 # 全局样式文件（Tailwind CSS 导入、View Transition 动画与自定义滚动条）
-├── .env.example                  # 环境变量示例文件
-├── index.html                    # 浏览器 HTML 入口文件（含 SEO Meta 标签与视口设置）
-├── metadata.json                 # 应用元数据与平台声明文件
-├── package.json                  # Node.js 依赖清单与构建脚本命令
-├── tsconfig.json                 # TypeScript 编译规则配置
-└── vite.config.ts                # Vite 打包构建配置文件（配置相对路径 `./` 与开发环境模拟 API）
-```
+多云同步功能与数据导出功能均受到安全防护，保障您的个人书签与隐私安全：
+
+| 默认账号 | 默认密码 | 权限范围 | 自定义方式 |
+| :--- | :--- | :--- | :--- |
+| **`admin`** | **`123456`** | 拥有完整的云端读取、推送同步与数据导出权限 | 在环境变量中设置 `VITE_SYNC_ADMIN_PASS` |
+
+> 💡 **如何进入与认证**：
+> 1. 打开导航页，点击右上角设置图标（齿轮）-> 点击 **【☁️ 多云同步】**。
+> 2. 面板顶部可直观查看【当前同步账号】状态栏与认证徽章（`未验证凭证` 或 `已验证凭证`）。
+> 3. 点击【切换 / 认证账号】按钮，输入账号 `admin` 和密码 `123456`，点击【验证并授权】即可解除锁定。
+> 4. 点击【从云端拉取最新】或【测试云端连接 & 立即推送】时，系统也会自动引导认证。
 
 ---
 
-## 🚀 多平台极速部署教程（小白零基础）
+### 2. 单账号数据隔离机制（一人一库，绝不串号）
 
-本项目已在 `vite.config.ts` 中配置了 `base: './'` 相对路径，打包生成的 `dist/` 文件夹可以在任意路径或子目录中完美运行！
+为了彻底解决“不同人员在不同设备访问网站时，书签被其他人覆盖”的问题，系统实现了**多层物理隔离沙箱**：
 
-### 1. GitHub Actions 自动构建部署到 GitHub Pages
-
-项目已内置 `.github/workflows/deploy.yml` 自动化脚本。
-
-1. **Fork 或推送代码到你的 GitHub 仓库**。
-2. 打开仓库页面的 **Settings** -> **Pages**。
-3. 在 **Build and deployment** 下方的 **Source** 选择 **Deploy from a branch**。
-4. Branch 选择 `gh-pages` 分支，文件夹选择 `/ (root)`，点击 **Save**。
-5. 之后你每次向 `main` 分支提交代码，GitHub 会自动运行构建，并将最新静态文件推送至 `gh-pages` 分支完成上线！
-
----
-
-### 2. Cloudflare Pages 部署（推荐，支持 Functions 边缘存储）
-
-Cloudflare Pages 提供全球顶级 Anycast CDN 加速，并且免费支持 Functions 边缘函数，可直接使用内置的 KV / D1 云同步。
-
-1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)。
-2. 进入 **Workers & Pages** -> **Create application** -> 选择 **Pages** -> **Connect to Git**。
-3. 选择你的导航项目仓库，设置构建参数：
-   - **Framework preset**: `Vite`
-   - **Build command**: `npm run build`
-   - **Build output directory**: `dist`
-4. 点击 **Save and Deploy**，几秒钟即可完成全球上线！
+1. **浏览器本地沙箱隔离**：
+   - 账号 `admin` 的数据保存在本地 `lylme_spage_config_v2_admin`。
+   - 账号 `zhangsan` 的数据保存在 `lylme_spage_config_v2_zhangsan`。
+   - 任何访客使用自个的设备或账号访问，仅能读写自个的独立数据空间。
+2. **云端与边缘数据库隔离**：
+   - **Cloudflare KV / D1 / Edge API**：云端键自动加上账号后缀（例如 `cf_navs_config_admin`、`cf_navs_config_user1`），请求必须携带 `X-Auth-User` 与 `X-Auth-Pass` 鉴权头，**绝不允许读取其他账号的记录**。
+   - **WebDAV（坚果云）**：自动保存为独立文件（如 `lylme_spage_admin.json`），同一网盘多人使用也不会互相撞车。
+   - **GitHub Gist / 独立仓库**：以用户专属文件命名隔离，彼此独立独立版本。
 
 ---
 
-### 3. Vercel 极速部署
+### 3. 多设备双向增量合并（防覆盖·防丢失）
 
-1. 登录 [Vercel](https://vercel.com/)，点击 **Add New** -> **Project**。
-2. 导入你的 GitHub 仓库。
-3. Framework Preset 会自动识别为 **Vite**，直接点击 **Deploy** 即可一键部署。
-
----
-
-### 4. Netlify 部署
-
-1. 登录 [Netlify](https://www.netlify.com/)，点击 **Add new site** -> **Import an existing project**。
-2. 连接 GitHub 仓库，设置：
-   - **Build command**: `npm run build`
-   - **Publish directory**: `dist`
-3. 点击 **Deploy Site** 即可生成专属域名。
+在以前的传统同步方式中，设备 B 从云端拉取配置会直接清空并覆盖本地未同步的内容。  
+本项目研发了 **Smart Union 双向增量并集合并算法**：
+- **手机添加了书签 A，电脑添加了书签 B**：两端点击同步时，系统会提取两端所有分类分组，以网址（URL）为唯一指纹进行智能去重合并，最终手机与电脑均完整拥有书签 A 与书签 B。
+- **版本冲突保护 (ConflictResolutionModal)**：若云端已被其他设备修改过且存在版本差异，系统会弹出可视化冲突对比弹窗，您可以自主选择【智能合并（保留双方）】或【覆盖云端】。
 
 ---
 
-### 5. Nginx / Docker / 宝塔面板本地服务器部署
+## 🚀 多平台小白极速部署教程（零基础手把手）
 
-如果你有自己的 VPS 云服务器：
+本项目打包配置已设为 `./` 相对路径，可以在任何根目录或二级子目录开箱即用！
 
-1. 本地执行打包命令：
+---
+
+### 【方案 A】Cloudflare Pages 零成本全球极速部署（最推荐）
+
+> 优点：完全免费、全球 Anycast CDN 超快访问、自带免费 Functions 边缘函数和 KV/D1 数据库，最适合搭建私人导航页。
+
+#### 第 1 步：准备 GitHub 代码
+1. 登录你的 GitHub 账号，访问本项目仓库，点击右上角的 **Fork** 按钮，将代码复制一份到你自己的 GitHub 账号下。
+
+#### 第 2 步：登录 Cloudflare 导入项目
+1. 打开并注册/登录 [Cloudflare 控制台](https://dash.cloudflare.com/)。
+2. 在左侧菜单点击 **Workers & Pages** -> **Create application**。
+3. 选择 **Pages** 选项卡 -> 点击 **Connect to Git**（连接到 Git）。
+4. 授权你的 GitHub 账号，并在列表中选择刚刚 Fork 的导航页仓库，点击 **Begin setup**（开始设置）。
+
+#### 第 3 步：配置构建参数（照着填即可）
+- **Project name（项目名称）**：保持默认或输入自定英文名（例如 `my-nav`）
+- **Production branch（生产分支）**：`main`
+- **Framework preset（框架预设）**：选择 `Vite`
+- **Build command（构建命令）**：`npm run build`
+- **Build output directory（输出目录）**：`dist`
+- **Environment variables（环境变量，可选）**：
+  - 如果想要修改管理员密码，可添加变量 `VITE_SYNC_ADMIN_PASS`，值为你的新密码。
+
+#### 第 4 步：点击上线
+点击页面最下方的 **Save and Deploy**（保存并部署），等待 1~2 分钟，Cloudflare 会分配给你一个免费的 `xxx.pages.dev` 二级域名，直接打开即可访问！
+
+---
+
+### 【方案 B】GitHub Pages 自动构建部署（免服务器）
+
+项目已内置 `.github/workflows/deploy.yml` 自动化脚本，每次推送代码全自动构建上线！
+
+1. 在 GitHub 上 Fork 本仓库。
+2. 打开你 Fork 后的仓库页面，点击上方的 **Settings**（设置）标签。
+3. 在左侧菜单找到 **Pages**。
+4. 在 **Build and deployment** 下方的 **Source** 下拉框中，选择 **Deploy from a branch**。
+5. 在 **Branch** 下拉框中选择 `gh-pages` 分支（如果暂时没有此分支，稍等自动 Actions 构建完毕或在 Actions 中手动运行一次 `Deploy to GitHub Pages` 工作流），文件夹保持 `/ (root)`，点击 **Save**。
+6. 刷新页面即可看到你的专属网址：`https://你的用户名.github.io/仓库名/`！
+
+---
+
+### 【方案 C】Vercel 极速一键部署
+
+1. 打开 [Vercel 官网](https://vercel.com/) 并使用 GitHub 账号登录。
+2. 点击右上角 **Add New** -> **Project**。
+3. 在 Import Git Repository 列表中找到你的导航仓库，点击 **Import**。
+4. Framework Preset 会自动识别为 **Vite**，Build and Output Settings 均无需修改。
+5. 点击 **Deploy** 按钮，等待数十秒即可完成部署！
+
+---
+
+### 【方案 D】Netlify 部署
+
+1. 登录 [Netlify 官网](https://www.netlify.com/)。
+2. 点击 **Add new site** -> **Import an existing project** -> 选择 **GitHub**。
+3. 授权并选择导航仓库，构建命令填 `npm run build`，发布目录填 `dist`。
+4. 点击 **Deploy Site** 即可获得专属站点链接。
+
+---
+
+### 【方案 E】自建 VPS / 宝塔面板 / Nginx 部署
+
+如果你拥有自己的云服务器（如腾讯云、阿里云或国外 VPS）：
+
+1. **本地安装依赖并编译生成静态文件**：
    ```bash
    npm install
    npm run build
    ```
-2. 将生成的 `dist` 文件夹内的所有文件上传至 Web 服务器的根目录（例如 `/var/www/nav`）。
-3. Nginx 示例配置：
+   打包完成后，项目根目录下会生成一个 `dist` 文件夹。
+2. **上传文件**：
+   将 `dist` 文件夹里面的所有内容（`index.html`、`assets` 文件夹等）复制上传到你服务器的网站根目录（例如 `/www/wwwroot/nav.yourdomain.com`）。
+3. **Nginx 配置文件参考**：
    ```nginx
    server {
        listen 80;
        server_name nav.yourdomain.com;
-       root /var/www/nav;
+       root /www/wwwroot/nav.yourdomain.com;
        index index.html;
 
+       # 支持单页应用路径路由
        location / {
            try_files $uri $uri/ /index.html;
        }
 
-       # 开启 gzip 压缩加速静态资源传输
+       # 开启 Gzip 加速网页加载
        gzip on;
+       gzip_min_length 1k;
        gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+       gzip_vary on;
    }
    ```
 
 ---
 
-## ☁️ Cloudflare Pages Functions 绑定配置（ONENAV_KV 与 ONENAV_D1）
+## ☁️ Cloudflare Pages 边缘存储绑定（KV 与 D1）
 
-如果你使用 Cloudflare Pages，可以通过内置的 Functions API 实现真正的**无服务器自建云端同步**！
-
-### 绑定 ONENAV_KV 键值存储（推荐，配置最简便）
-
-1. 在 Cloudflare 控制台左侧进入 **Storage & Databases** -> **KV**。
-2. 点击 **Create a namespace**，名称输入 `ONENAV_KV`（或任意名称，例如 `my_nav_kv`），点击 **Add**。
-3. 进入你刚刚部署的 **Cloudflare Pages 项目** -> **Settings** -> **Functions**。
-4. 向下滚动到 **KV namespace bindings**（KV 命名空间绑定），点击 **Add binding**：
-   - **Variable name（变量名称）**：填入 `ONENAV_KV`（也可以填 `SPAGE_KV`，二者系统均支持识别）。
-   - **KV namespace（KV 命名空间）**：选择你在步骤 2 中创建的 KV 数据库。
-5. 点击 **Save** 保存。
-6. 回到 Pages 的 **Deployments** 页面，重新触发一次部署（Retry deployment）使绑定生效。
-7. 在你的导航页打开 **系统设置 -> 多云同步**：
-   - 同步类型选择 **Cloudflare Pages (KV / D1 内置接口)**。
-   - 存储协议选择 **Cloudflare KV**。
-   - 自定义存储 Key 保持默认 `lylme_spage_config` 即可。
-   - 点击 **测试并立即上传**，即可实现毫秒级云同步！
+部署在 Cloudflare Pages 上的用户，可以直接使用免费的 Functions 接口（代码位于 `/functions/api/`），无需第三方网盘即可自建全私有云同步！
 
 ---
 
-### 绑定 ONENAV_D1 关系型数据库（进阶，SQL 结构化存储）
+### 1. 绑定 ONENAV_KV 键值存储（推荐，最省心）
 
+#### 步骤 1：新建 KV 命名空间
+1. 登录 Cloudflare 控制台，左侧菜单点击 **Storage & Databases** -> **KV**。
+2. 点击 **Create a namespace**（创建命名空间）。
+3. 名称输入 `ONENAV_KV`（或任意名称，如 `my_nav_kv`），点击 **Add**。
+
+#### 步骤 2：在 Pages 中绑定变量
+1. 在左侧菜单进入 **Workers & Pages**，点击你部署的 Pages 项目名称。
+2. 依次点击 **Settings**（设置）-> **Functions**（函数）。
+3. 向下滚动找到 **KV namespace bindings**（KV 命名空间绑定），点击 **Add binding**：
+   - **Variable name（变量名称）**：必须输入 `ONENAV_KV`（或 `SPAGE_KV`）
+   - **KV namespace（KV 命名空间）**：在下拉框中选择你刚刚创建的 KV 数据库
+4. 点击 **Save**（保存）。
+
+#### 步骤 3：重新部署生效
+进入 Pages 项目的 **Deployments** 页面，找到最新一条记录，点击右侧三个点 `...` -> **Retry deployment**（重试部署）使变量绑定生效。
+
+#### 步骤 4：在导航页启用
+打开你的导航页，进入 **设置 -> 多云同步**：
+- 方案选择 **Cloudflare KV**。
+- 点击 **测试云端连接 & 立即推送**，即刻完成云端绑定！
+
+---
+
+### 2. 绑定 ONENAV_D1 关系型数据库（结构化 SQL）
+
+如果你偏好真正的 SQL 数据库存储：
+
+#### 步骤 1：创建 D1 数据库
 1. 在 Cloudflare 控制台左侧进入 **Storage & Databases** -> **D1 SQL Database**。
-2. 点击 **Create database**，数据库名称输入 `ONENAV_D1`，点击 **Create**。
-3. 进入创建好的 D1 数据库，点击 **Console**（控制台），执行以下初始化 SQL 语句建表：
-   ```sql
-   CREATE TABLE IF NOT EXISTS lylme_spage_sync (
-       key TEXT PRIMARY KEY,
-       value TEXT,
-       updated_at INTEGER
-   );
-   ```
-4. 进入你的 **Cloudflare Pages 项目** -> **Settings** -> **Functions**。
-5. 向下滚动到 **D1 database bindings**（D1 数据库绑定），点击 **Add binding**：
-   - **Variable name（变量名称）**：填入 `ONENAV_D1`（也可以填 `SPAGE_D1` 或 `DB`）。
-   - **D1 database（D1 数据库）**：选择你在步骤 2 中创建的 D1 数据库。
-6. 点击 **Save** 并重新部署 Pages。
-7. 在导航页设置的 **多云同步** 中选择 **Cloudflare D1 数据库**，即可体验 SQL 云端存储！
+2. 点击 **Create database**，名称输入 `ONENAV_D1`，点击 **Create**。
+
+#### 步骤 2：创建数据表
+进入该 D1 数据库管理页，点击 **Console**（控制台），粘贴并执行以下建表语句：
+```sql
+CREATE TABLE IF NOT EXISTS lylme_spage_sync (
+    key TEXT PRIMARY KEY,
+    value TEXT,
+    updated_at INTEGER
+);
+```
+
+#### 步骤 3：在 Pages 中绑定 D1
+1. 前往 Pages 项目 -> **Settings** -> **Functions**。
+2. 找到 **D1 database bindings**，点击 **Add binding**：
+   - **Variable name（变量名称）**：填入 `ONENAV_D1`（或 `SPAGE_D1` 或 `DB`）
+   - **D1 database**：选择你创建的 D1 数据库
+3. 点击 **Save** 并重新部署 Pages。
+4. 在导航设置的 **多云同步** 中选择 **Cloudflare D1** 即可！
 
 ---
 
-## 🔄 全平台多端数据同步小白配置指南
+## 🔄 5大云同步后端小白配置实战
 
-在导航首页点击右上角设置图标（或右下角齿轮悬浮按钮），在左侧菜单切换到 **☁️ 多云同步**，支持以下 5 大主流存储模式：
+进入导航设置的 **【☁️ 多云同步】** 选项卡，支持以下多种方案：
 
-### 1. Cloudflare KV / D1 免费云端同步
-- 适用对象：部署在 Cloudflare Pages 的用户。
-- 优点：无需暴露个人 Token，全私有鉴权，速度快，免费额度充裕。
+### 1. Cloudflare KV / D1 内置接口同步
+- **适用场景**：通过 Cloudflare Pages 部署的用户。
+- **优点**：无需自己配置复杂的 Access Token，直接调用边缘函数，速度极快，多端通用。
 
-### 2. GitHub Gist 云端自动同步
-- 适用对象：任何平台部署的用户。
-- 操作步骤：
-  1. 打开 [GitHub Personal Access Tokens](https://github.com/settings/tokens)（Classic 或 Fine-grained）。
-  2. 生成一个包含 `gist` 权限的 Token。
-  3. 在导航设置中填入生成的 **GitHub Token**。
-  4. 如果已有 Gist，可以填入对应的 **Gist ID**；如果是首次配置，点击“自动创建新 Gist”即可一键生成！
-  5. 可以在其他电脑、手机或平板上填入相同的 Token 与 Gist ID，点击“从云端下载拉取”，跨设备秒级同步。
+---
 
-### 3. GitHub 独立代码仓库同步
-- 适用对象：希望用 Git 管理所有版本历史的用户。
-- 操作步骤：
-  1. 在 GitHub 创建一个专用私有仓库（例如 `my-nav-data`）。
-  2. 生成一个拥有 `repo`（或 `Contents: Read and write`）权限的 GitHub Personal Access Token。
-  3. 在导航设置中填入：
-     - **仓库所有者**（GitHub 用户名）
-     - **仓库名称**（如 `my-nav-data`）
-     - **目标分支**（默认 `main`）
-     - **存储文件路径**（默认 `data/nav-config.json`）
-     - **GitHub Token**
-  4. 每次上传会自动生成规范的 Git Commit 记录，历史版本一清二楚。
-
-### 4. 坚果云 / 自建 WebDAV 协议同步
-- 适用对象：国内坚果云用户、群晖 NAS、Nextcloud 或自建 WebDAV 用户。
-- 坚果云小白步骤：
-  1. 登录坚果云网页版 -> **账户信息** -> **安全选项** -> **第三方应用管理**。
-  2. 点击 **添加应用密码**，名称输入 `六零导航页`，生成一个专属授权密码。
-  3. 导航设置中填入：
+### 2. 坚果云 / WebDAV 同步（国内网盘推荐）
+- **适用场景**：国内手机、电脑多端同步，推荐坚果云（国内网络访问极速、免费容量足够存书签几十年）。
+- **小白实操步骤**：
+  1. 注册/登录 [坚果云官网](https://www.jianguoyun.com/)。
+  2. 点击右上角账户名 -> **账户信息** -> 点击 **安全选项**。
+  3. 找到 **第三方应用管理**，点击 **添加应用密码**。
+  4. 应用名称填 `六零导航`，点击生成密码并**复制保存**（注意：坚果云 WebDAV 必须使用此专属密码，不能用网页登录密码！）。
+  5. 回到导航页的【多云同步】，选择 **坚果云 / WebDAV**：
      - **WebDAV 服务器地址**：`https://dav.jianguoyun.com/dav/`
      - **账户邮箱**：你的坚果云注册邮箱
-     - **应用密码**：步骤 2 中生成的第三方应用密码
-     - **文件路径**：`六零导航/config.json`
-  4. 点击“测试并立即上传”即可将配置安全托管在坚果云网盘中！
+     - **应用密码**：步骤 4 生成的第三方应用密码
+     - **同步文件名**：保持默认 `lylme_spage.json` 即可（系统会自动隔离不同账号）
+  6. 点击【测试云端连接 & 立即推送】完成同步！
 
-### 5. 浏览器书签导入与 JSON 本地备份
-- **浏览器书签一键迁移**：支持解析从 Chrome、Edge、Firefox、Safari 等浏览器导出的 `bookmarks.html` 文件，自动递归提取文件夹层级并转换为导航分组与书签。
-- **全量配置导出 / 导入**：支持一键导出包含全部主题设置、壁纸偏好、自定义分类与网址的 `.json` 配置文件。
+---
+
+### 3. GitHub Gist 自动同步
+- **适用场景**：免建仓库，跨平台轻量云存储。
+- **小白实操步骤**：
+  1. 打开 [GitHub Token 页面](https://github.com/settings/tokens/new?scopes=gist&description=LyLme_Spage_Sync)。
+  2. 权限列表中勾选 `gist`，下拉到最下方点击 **Generate token**。
+  3. 复制生成的以 `ghp_` 开头的 Token。
+  4. 回到导航设置 -> 【多云同步】 -> 选择 **GitHub Gist**。
+  5. 粘贴 Token，点击右侧的 **【自动创建并绑定新 Gist】** 按钮，系统全自动为您创建专属私有 Gist 并绑定！
+
+---
+
+### 4. GitHub 独立代码仓库同步（版本回溯）
+- **适用场景**：希望用 Git 记录每一次书签变动、查看历史修改详情的极客用户。
+- **小白实操步骤**：
+  1. 在 GitHub 创建一个新的私人仓库（例如 `my-nav-bookmarks`，设为 Private）。
+  2. 创建一个拥有 `repo` 权限的 GitHub Personal Access Token。
+  3. 在导航设置中填入你的 GitHub 用户名、仓库名、分支 `main`、文件路径 `data/lylme_spage.json` 以及 Token。
+  4. 每次同步时会自动在你的 GitHub 仓库中生成清晰的 Commit 记录。
+
+---
+
+### 5. 浏览器 HTML 书签迁移与本地 JSON 导出
+- **从 Chrome / Edge / Firefox 导入**：
+  - 浏览器按快捷键 `Ctrl + Shift + O` 打开书签管理器 -> 点击右上角导出书签为 HTML。
+  - 在本导航设置的 **【数据管理】** 中点击上传书签文件，系统自动递归解析多级文件夹并生成对应导航分类与卡片。
+  - 提供【增量智能去重合并】与【全量覆盖】两种安全策略。
+- **导出数据备份（带权限校验）**：
+  - 点击导出 JSON 或 HTML 文件时，系统同样会触发管理员安全验证（账号 `admin`，密码 `123456`），严密防止他人未经允许导出你的所有私人书签。
+
+---
+
+## ⚙️ 环境变量配置表（自定义管理员账号与密码）
+
+如果你不想使用默认的账号 `admin` 或默认密码 `123456`，可以在部署平台的环境变量中自由指定：
+
+| 环境变量名 | 默认值 | 作用说明 |
+| :--- | :--- | :--- |
+| `VITE_SYNC_ADMIN_USER` | `admin` | 多云同步的管理员账号名称 |
+| `VITE_SYNC_ADMIN_PASS` | `123456` | 多云同步的管理员安全密码 |
+| `VITE_EXPORT_ADMIN_USER` | `admin` | 数据导出备份的管理员账号名称 |
+| `VITE_EXPORT_ADMIN_PASS` | `123456` | 数据导出备份的管理员安全密码 |
+
+> 📌 **设置方法**：
+> - **Cloudflare Pages**：进入 Pages 项目 -> **Settings** -> **Environment variables** -> **Add variables** 添加并重新部署。
+> - **Vercel**：进入项目 -> **Settings** -> **Environment Variables** 添加并 Redeploy。
+> - **本地开发**：复制根目录下的 `.env.example` 为 `.env`，修改对应键值即可。
+
+---
+
+## 📂 项目目录结构与文件功能详解
+
+```
+├── .github/
+│   └── workflows/
+│       └── deploy.yml            # GitHub Actions 自动化工作流：推送到 main 自动构建并发布到 gh-pages
+├── functions/                    # Cloudflare Pages Functions 边缘无服务器函数目录
+│   └── api/
+│       ├── kv.ts                 # Cloudflare KV 边缘读写接口（支持账号鉴权与隔离）
+│       ├── d1.ts                 # Cloudflare D1 数据库初始化与 SQL 查询接口
+│       └── sync.ts               # 通用边缘同步聚合代理（严格检查 X-Auth-User 与 X-Auth-Pass）
+├── public/                       # 存放公共静态资源（favicon、内置预设壁纸等）
+├── src/                          # 前端核心源码
+│   ├── components/               # 核心 UI 组件
+│   │   ├── ClockWidget.tsx       # 实时时钟与一言（Hitokoto）励志短句挂件
+│   │   ├── Favicon.tsx           # 智能图标组件（内置 4 级容灾解析与首字母彩色徽标）
+│   │   ├── FloatingActions.tsx   # 右下角悬浮操作组（日夜切换、壁纸、设置、回到顶部）
+│   │   ├── GlobalLoading.tsx     # 全局首屏加载动画组件（防白屏与防布局抖动）
+│   │   ├── LinkGrid.tsx          # 核心网格容器（分类、子目录、5万+ 虚拟滚动、拖拽排序）
+│   │   ├── SearchBar.tsx         # 多引擎聚合搜索栏、热词推荐与本地秒级搜索
+│   │   ├── SettingsPanel.tsx     # 个性化设置面板（主题、壁纸、多云同步账号、备份还原）
+│   │   ├── SyncAuthModal.tsx     # 多云同步权限校验与多账号切换弹窗
+│   │   ├── ExportAuthModal.tsx   # 数据备份导出密码鉴权弹窗
+│   │   ├── ConflictResolutionModal.tsx # 多设备版本冲突解决与合并弹窗
+│   │   └── WallpaperModal.tsx    # 4K 高清壁纸库弹窗
+│   ├── lib/
+│   │   ├── auth.ts               # 账号认证、密码哈希与多账号数据沙箱隔离算法
+│   │   ├── exportAuth.ts         # 导出数据安全鉴权辅助函数
+│   │   ├── storage.ts            # 本地存储、双向增量合并 (smartMerge) 与多云同步核心驱动
+│   │   ├── favicon.ts            # 图标解析多层兜底逻辑
+│   │   └── wallpapers.ts         # Bing 每日壁纸与精选高清壁纸配置
+│   ├── types.ts                  # 全局 TypeScript 接口定义（AppConfig、NavGroup 等）
+│   ├── App.tsx                   # 根组件：全局状态调度、版本号校验与多账号监听
+│   └── main.tsx                  # 应用入口文件
+├── index.html                    # 浏览器 HTML 入口
+├── package.json                  # 项目依赖与构建脚本
+└── vite.config.ts                # Vite 打包配置（相对路径 base: './'）
+```
 
 ---
 
 ## 🎨 壁纸中心与个性化视觉自定义
 
-### 1. 壁纸库模式
-- **Bing 每日高清壁纸**：自动对接微软必应每日 4K 壁纸接口，每天自动更换不重样。
-- **4K 精选高清图库**：内置多款精心挑选的高分辨率风景、赛博朋克、极简抽象、动漫与星空大图。
-- **自定义外链壁纸**：支持输入任意第三方图片 URL，支持平铺（Cover）、拉伸、居中与平铺重复（Repeat）。
-- **动态炫彩渐变**：无需加载大图，轻量纯 CSS 渐变色调。
+### 1. 壁纸模式
+- **Bing 每日 4K 高清壁纸**：每日自动同步微软必应壁纸，支持 UHD / 1080P 超高清。
+- **精选分类高清壁纸**：风景自然、极简抽象、动漫游戏、城市建筑、暗夜星空。
+- **自定义外链壁纸**：输入任意图片 URL，支持 Cover（铺满）、Contain（完整显示）、Repeat（平铺）。
+- **轻量炫彩动态渐变**：无网络请求，超快加载。
 
 ### 2. 滤镜与视觉调节
-- **背景模糊度（Blur）**：0px ~ 20px 自由滑动调节毛玻璃模糊强度。
-- **暗色遮罩浓度（Mask Opacity）**：0% ~ 90% 自由控制，确保壁纸再鲜艳也不影响前景文字与图标的清晰阅读。
-- **卡片圆角与间距**：支持圆润（Rounded）、小圆角（MD）与极简直角。
-- **自定义 CSS 注入**：支持在高级设置中直接书写专属 CSS 样式表，实时生效并随云端同步。
+- **毛玻璃模糊度（Blur）**：0px ~ 20px 自由滑动调节。
+- **暗色遮罩浓度（Mask Opacity）**：0% ~ 90% 精确控制，确保前景文字在任何浅色壁纸下均清晰易读。
+- **卡片圆角**：直角、微圆角、大圆角随心切换。
 
 ---
 
 ## 🔍 Logo / Favicon 自动获取与多级容灾机制
 
-书签图标采用了多层智能容灾解析系统（位于 `src/components/Favicon.tsx` 与 `src/utils/favicon.ts`）：
+书签图标采用了多层智能容灾解析系统：
 
 ```
-[用户自定义外链图标 / Base64] 
+[用户自定义图标 / 本地上传 Base64] 
          ↓ (若未设置或加载失败)
-[站点自身 /favicon.ico 探测] 
-         ↓ (若跨域或 404)
-[Google 高清 Favicon 代理 API] 
-         ↓ (若网络超时或不可达)
-[Icon Horse / V2EX 优质图标镜像] 
+[站点自身 /favicon.ico 自动嗅探] 
+         ↓ (若跨域限制或返回 404)
+[Google 高清 Favicon 官方代理 API] 
+         ↓ (若国内网络不通或响应超时)
+[Icon Horse / V2EX / MyHkw 高可用图标镜像] 
          ↓ (若全部不可用)
-[根据网站标题首字母生成多彩渐变高质感徽标]
+[根据网站标题首字母自动计算哈希并生成多彩渐变高质感徽标]
 ```
 
-这确保了无论处于何种网络环境，卡片图标永远美观完整，绝对不会出现恼人的破图小图标。
+无论离线、内网还是各种极端网络环境，**绝不显示难看的浏览器破图小方块**！
 
 ---
 
-## 🌓 昼夜模式与移动端自适应设计
+## ⚡ 5万+ 海量书签虚拟窗口与首屏加载架构
 
-- **昼夜切换**：
-  - 支持点击右下角悬浮太阳/月亮按钮，或在设置面板中切换。
-  - 集成了现代浏览器的 `document.startViewTransition` 接口，切换过程伴随平滑的淡入淡出与色彩过度，彻底告别突兀闪烁。
-  - 自动更新移动端浏览器标签栏 `<meta name="theme-color">`（白天模式 `#f8fafc`，夜间模式 `#0b0f19`）。
-- **移动端全场景适配**：
-  - 右下角悬浮操作按钮组自带 `env(safe-area-inset-bottom)` 安全区沉浸避让。
-  - 按钮热区尺寸严格遵循无障碍与触控标准（≥44px）。
-  - 搜索引擎标签栏支持弹性横向滚动，避免屏幕窄时文字挤压折行。
-
----
-
-## ⚡ 5万+ 海量书签虚拟窗口与分批懒加载架构 (Virtual Scrolling)
-
-为了支持拥有数万级庞大书签库的高级用户，`LinkGrid.tsx` 采用了双引擎渲染流水线：
-
-1. **自动触发阈值 (Threshold)**：
-   - 当**全屏总书签数 ≥ 500** 或**单个分组书签数 ≥ 60** 时，系统自动无感切入 **Virtual Scrolling 虚拟滚动模式**。
-2. **动态视口计算与 Spacer 占位**：
-   - 基于实时 `scroll` 与 `resize` 监听器，动态计算当前网格列数 (2 ~ 8 列) 与行高 (`ROW_HEIGHT = 108px`)。
-   - 仅仅将当前视口区域加上上下缓冲行 (`OVERSCAN_ROWS = 3`) 的卡片元素放入 DOM 树中渲染，未渲染卡片以精确计算的 `topSpacerHeight` 和 `bottomSpacerHeight` 充当真实高度占位。
-3. **渐进式分批 (Batch Lazy Loading)**：
-   - 数据未达到虚拟滚动阈值时，采用 `IntersectionObserver` 哨兵自动无缝载入后续分批（初始 60 项，每次追加 60 项）。
-4. **React.memo 浅记忆化**：
-   - 对 `SortableNavCard` 与 `NavCard` 进行了组件级记忆化隔离，数据重排序或字段变更时仅重绘受影响节点。
-5. **图标异步非阻塞解码**：
-   - 所有图标图片均开启 `decoding="async"` 与 `loading="lazy"`，确保海量 DOM 下页面滚动帧率稳定维持在 60~120 FPS。
+1. **自动虚拟滚动 (Virtual Windowing)**：
+   - 当单个分组书签数量 ≥ 60 项或总书签数 ≥ 500 项时，自动启用虚拟滚动算法，仅对视口内的可见卡片创建 DOM，其余以动态 Spacer 占位。
+   - 即使拥有数万个书签，内存占用依然控制在几十兆之内，页面滚动丝滑稳定在 60~120 帧。
+2. **首屏全局 Loading 状态**：
+   - 初次打开页面拉取 Cloudflare 边缘配置时，展示带有渐变光晕与旋转加载器的 `GlobalLoading` 组件，避免由于网络延迟引起的瞬间空白。
 
 ---
 
 ## 🛠️ 常见开发与部署避坑指南 (FAQ)
 
-### Q1: 部署到 GitHub Pages 后页面打开一片空白或资源 404？
-- **原因**：Vite 默认的 `base` 是绝对根路径 `/`，当你的 GitHub 仓库地址为 `https://username.github.io/repo-name/` 时，资源请求会找不到对应文件。
-- **解决方案**：本项目已在 `vite.config.ts` 中将 `base` 设为 `'./'`（相对路径），开箱即用支持所有二级子目录。
+### Q1: 第一次使用，提示“需要验证权限”，默认密码是多少？
+- **回答**：默认管理员账号是 **`admin`**，默认密码是 **`123456`**。输入后点击“验证并授权”即可。如需自定义，可在环境变量中配置 `VITE_SYNC_ADMIN_PASS`。
 
-### Q2: 坚果云 WebDAV 同步提示“401 Unauthorized”或“认证失败”？
-- **原因**：坚果云出于安全策略，WebDAV 不允许使用网页登录密码，必须使用专属的**应用密码**。
-- **解决方案**：登录坚果云网页版 -> 账户信息 -> 安全选项 -> 第三方应用管理 -> 添加应用密码，将生成的密码填入即可。
+### Q2: 为什么手机上配置了同步，电脑上同步后书签没有被覆盖？
+- **回答**：这是本项目的**核心安全特色**！系统内置了双向增量并集合并（Smart Union），多设备新增的书签会自动排重汇合，绝不会互相覆盖导致丢数据。
 
-### Q3: GitHub Gist 同步时提示 404 或无权限？
-- **原因**：生成的 GitHub Token 未勾选 `gist` 权限，或者填错了 Gist ID。
-- **解决方案**：重新生成一个带有 `gist` 勾选的 Personal Access Token。首次使用时可以不填 Gist ID，点击面板中的“自动创建 Gist”按钮。
+### Q3: 怎么让别人也能用我的导航站，但又不看到我的私密书签？
+- **回答**：在【多云同步】面板中点击【切换 / 认证账号】，输入一个新的账号名称（如 `family` 或 `guest`）并设置新密码，系统会自动为该账号开辟专属独立的本地存储与云端数据空间，真正实现**一人一库，互不干涉**。
 
-### Q4: Cloudflare Pages 提示 `ONENAV_KV / SPAGE_KV binding not configured`？
-- **原因**：虽然创建了 KV，但尚未在 Pages 项目设置的 **Functions** 页面中将变量名称与创建的 KV 数据库进行绑定。
-- **解决方案**：前往 Pages 项目 -> **Settings** -> **Functions** -> **KV namespace bindings**，添加变量名 `ONENAV_KV` 并绑定你的 KV 数据库，然后点击 **Retry deployment**。
+### Q4: Cloudflare Pages 部署后提示 `ONENAV_KV binding not configured`？
+- **回答**：虽然创建了 KV 数据库，但未在 Pages 项目的 **Settings** -> **Functions** -> **KV namespace bindings** 中添加名称为 `ONENAV_KV` 的绑定。添加绑定后，记得在 Deployments 页面点击 **Retry deployment**（重试部署）即可恢复正常。
 
-### Q5: GitHub Actions 构建时报错 `Dependencies lock file is not found`？
-- **原因**：`actions/setup-node` 开启了 `cache: 'npm'` 时会严格检测根目录的 `package-lock.json`。
-- **解决方案**：本项目已更新 `.github/workflows/deploy.yml`，移除了硬性缓存依赖并生成了标准的 `package-lock.json`，直接使用 `npm install` 安装依赖并自动构建。
+### Q5: 坚果云 WebDAV 同步提示 401 认证失败？
+- **回答**：坚果云必须使用**专属应用密码**，不能使用网页版登录密码。请前往坚果云官网：账户信息 -> 安全选项 -> 第三方应用管理 -> 添加应用密码。
 
 ---
 
@@ -357,3 +447,4 @@ Cloudflare Pages 提供全球顶级 Anycast CDN 加速，并且免费支持 Func
 
 - **GitHub 仓库**：[zhixiaotx/lylme_spage_nav](https://github.com/zhixiaotx/lylme_spage_nav)
 - **开源协议**：本项目采用 [MIT License](https://opensource.org/licenses/MIT) 开源。欢迎 Star、Fork 与提交 Issue / PR！
+

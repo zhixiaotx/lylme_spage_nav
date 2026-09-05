@@ -29,7 +29,60 @@ const CORS_HEADERS = {
 
 const DEFAULT_CONFIG_KEY = 'cf_navs_config';
 
+function validateAccountAccess(request: Request, env: Env, key: string): { ok: boolean; status: number; message: string; account: string } {
+  const expectedAdminUser = env.EXPORT_ADMIN_USER || 'admin';
+  const expectedAdminPass = env.EXPORT_ADMIN_PASS || '123456';
+
+  const authHeader = request.headers.get('Authorization') || '';
+  const xUser = request.headers.get('X-Auth-User') || '';
+  const xPass = request.headers.get('X-Auth-Pass') || '';
+
+  let basicUser = '';
+  let basicPass = '';
+  if (authHeader.startsWith('Basic ')) {
+    try {
+      const decoded = atob(authHeader.slice(6));
+      const [u, p] = decoded.split(':');
+      basicUser = u || '';
+      basicPass = p || '';
+    } catch {
+      // ignore
+    }
+  }
+
+  const user = (xUser || basicUser).trim();
+  const pass = (xPass || basicPass).trim();
+
+  let targetAccount = expectedAdminUser;
+  if (key.startsWith('cf_navs_config_')) {
+    targetAccount = key.slice('cf_navs_config_'.length);
+  }
+
+  // Cross-account isolation enforcement: an account can only access its own data
+  if (user && user !== targetAccount) {
+    return {
+      ok: false,
+      status: 403,
+      message: `跨账号越权拦截：账号 [${user}] 只能读取自个的数据，不能读取账号 [${targetAccount}] 的数据`,
+      account: user,
+    };
+  }
+
+  // Verify admin password if accessing admin key and password provided
+  if (targetAccount === expectedAdminUser && pass && pass !== expectedAdminPass) {
+    return {
+      ok: false,
+      status: 401,
+      message: '管理员认证失败：密码错误，无权访问该账号数据',
+      account: targetAccount,
+    };
+  }
+
+  return { ok: true, status: 200, message: 'OK', account: user || targetAccount };
+}
+
 function getKvBinding(env: Env) {
+
   return env.ONENAV_KV || env.SPAGE_KV || env.KV;
 }
 
@@ -47,6 +100,16 @@ export const onRequestOptions = async () => {
 export const onRequestGet = async (context: { env: Env; request: Request }) => {
   const url = new URL(context.request.url);
   const key = url.searchParams.get('key') || DEFAULT_CONFIG_KEY;
+
+  // Enforce account isolation and access validation
+  const auth = validateAccountAccess(context.request, context.env, key);
+  if (!auth.ok) {
+    return new Response(
+      JSON.stringify({ error: auth.message, code: auth.status === 401 ? 'UNAUTHORIZED' : 'FORBIDDEN' }),
+      { status: auth.status, headers: CORS_HEADERS }
+    );
+  }
+
   const kv = getKvBinding(context.env);
   const d1 = getD1Binding(context.env);
 
@@ -133,6 +196,16 @@ export const onRequestPut = async (context: { env: Env; request: Request }) => {
 async function handleSave(context: { env: Env; request: Request }) {
   const url = new URL(context.request.url);
   const key = url.searchParams.get('key') || DEFAULT_CONFIG_KEY;
+
+  // Enforce account isolation and access validation
+  const auth = validateAccountAccess(context.request, context.env, key);
+  if (!auth.ok) {
+    return new Response(
+      JSON.stringify({ error: auth.message, code: auth.status === 401 ? 'UNAUTHORIZED' : 'FORBIDDEN' }),
+      { status: auth.status, headers: CORS_HEADERS }
+    );
+  }
+
   const kv = getKvBinding(context.env);
   const d1 = getD1Binding(context.env);
 

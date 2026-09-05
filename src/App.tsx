@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { AppConfig, NavItem, NavGroup, SearchEngine } from './types';
-import { loadConfig, saveConfig, syncPull, syncPush } from './lib/storage';
+import {
+  loadConfig,
+  saveConfig,
+  syncPull,
+  syncPush,
+  checkSyncConflict,
+  twoWayMergeConfigs,
+  syncPushForce,
+} from './lib/storage';
+import { isSyncAuthenticated, getActiveAccount } from './lib/auth';
 import { PALETTE_THEMES } from './constants';
 import { ClockWidget } from './components/ClockWidget';
 import { SearchBar } from './components/SearchBar';
@@ -9,6 +18,8 @@ import { LinkEditorModal } from './components/LinkEditorModal';
 import { SettingsPanel } from './components/SettingsPanel';
 import { FloatingActions } from './components/FloatingActions';
 import { MusicPlayerLoader } from './components/MusicPlayerLoader';
+import { GlobalLoading } from './components/GlobalLoading';
+import { ConflictResolutionModal, ConflictInfo } from './components/ConflictResolutionModal';
 import {
   Settings,
   Edit3,
@@ -42,6 +53,15 @@ export default function App() {
   const [editingItem, setEditingItem] = useState<{ item?: NavItem; groupId?: string } | null>(null);
   const [editingGroup, setEditingGroup] = useState<NavGroup | null>(null);
 
+  // Global loading state during initial Cloudflare edge / cloud config fetch
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(() => {
+    return config.sync.provider !== 'none';
+  });
+
+  // Conflict resolution modal state
+  const [conflictModalOpen, setConflictModalOpen] = useState(false);
+  const [conflictInfo, setConflictInfo] = useState<ConflictInfo | null>(null);
+
   // Sync state
   const [syncStatus, setSyncStatus] = useState<{
     status: 'idle' | 'syncing' | 'success' | 'error';
@@ -63,29 +83,60 @@ export default function App() {
     return config.groups.flatMap((g) => g.items);
   }, [config.groups]);
 
-  // Initial Sync from Cloud on mount if provider is configured
+  // Initial Sync from Cloudflare edge / cloud provider on mount
   useEffect(() => {
+    let isMounted = true;
+    // Fallback safety timeout so user is never stuck in loading
+    const safetyTimer = setTimeout(() => {
+      if (isMounted) setIsInitialLoading(false);
+    }, 3200);
+
     if (config.sync.provider !== 'none') {
       const fetchRemote = async () => {
-        setSyncStatus({ status: 'syncing', message: '正在从云端拉取最新配置...' });
-        const res = await syncPull(config);
-        if (res.success && res.config) {
-          setConfig(res.config);
-          setSyncStatus({
-            status: 'success',
-            message: '云端同步成功',
-            lastSyncedAt: Date.now(),
-          });
-        } else {
+        setSyncStatus({ status: 'syncing', message: '正在从 Cloudflare 边缘接口拉取最新配置...' });
+        try {
+          const res = await syncPull(config);
+          if (!isMounted) return;
+          if (res.success && res.config) {
+            setConfig(res.config);
+            setSyncStatus({
+              status: 'success',
+              message: res.message || '云端同步成功',
+              lastSyncedAt: Date.now(),
+            });
+          } else {
+            setSyncStatus({
+              status: 'error',
+              message: res.message || '从云端同步失败',
+              lastSyncedAt: config.sync.lastSyncedAt,
+            });
+          }
+        } catch (err: any) {
+          if (!isMounted) return;
           setSyncStatus({
             status: 'error',
-            message: res.message || '从云端同步失败',
+            message: `初始化边缘同步异常: ${err?.message || err}`,
             lastSyncedAt: config.sync.lastSyncedAt,
           });
+        } finally {
+          if (isMounted) {
+            clearTimeout(safetyTimer);
+            setTimeout(() => {
+              if (isMounted) setIsInitialLoading(false);
+            }, 300);
+          }
         }
       };
       fetchRemote();
+    } else {
+      setIsInitialLoading(false);
+      clearTimeout(safetyTimer);
     }
+
+    return () => {
+      isMounted = false;
+      clearTimeout(safetyTimer);
+    };
   }, []);
 
   // Periodic background sync if enabled
@@ -108,18 +159,54 @@ export default function App() {
     return () => clearInterval(interval);
   }, [config.sync.provider, config.sync.syncIntervalMinutes]);
 
-  // Handle local state update and trigger debounced sync
+  // Handle local state update and trigger debounced sync with forced version conflict check
   const handleConfigUpdate = (newConfig: AppConfig) => {
-    setConfig(newConfig);
-    saveConfig(newConfig);
+    const stampedConfig: AppConfig = {
+      ...newConfig,
+      updatedAt: Date.now(),
+      revision: (newConfig.revision || 0) + 1,
+    };
+    setConfig(stampedConfig);
+    saveConfig(stampedConfig);
 
-    // If auto sync is on and provider selected, push to cloud
-    if (newConfig.sync.autoSync && newConfig.sync.provider !== 'none') {
+    // If auto sync is on and provider selected, push to cloud with version comparison
+    if (stampedConfig.sync.autoSync && stampedConfig.sync.provider !== 'none') {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(async () => {
-        setSyncStatus({ status: 'syncing', message: '正在同步到云端...' });
-        const res = await syncPush(newConfig);
+        setSyncStatus({ status: 'syncing', message: '正在验证云端版本并安全同步...' });
+
+        // 1. Mandatory version check to detect multi-device conflicts
+        try {
+          const conflictCheck = await checkSyncConflict(stampedConfig);
+          if (conflictCheck.hasConflict && conflictCheck.remoteConfig) {
+            setSyncStatus({
+              status: 'error',
+              message: '检测到云端配置已被其他设备更新 (版本冲突)',
+              lastSyncedAt: stampedConfig.sync.lastSyncedAt,
+            });
+            setConflictInfo({
+              localConfig: stampedConfig,
+              remoteConfig: conflictCheck.remoteConfig,
+              localUpdatedAt: stampedConfig.updatedAt,
+              remoteUpdatedAt: conflictCheck.remoteUpdatedAt,
+              localGroupCount: conflictCheck.localGroupCount,
+              remoteGroupCount: conflictCheck.remoteGroupCount,
+              localBookmarkCount: conflictCheck.localBookmarkCount,
+              remoteBookmarkCount: conflictCheck.remoteBookmarkCount,
+            });
+            setConflictModalOpen(true);
+            return;
+          }
+        } catch (err) {
+          console.warn('Conflict check checkSyncConflict warning:', err);
+        }
+
+        // 2. Safe push when no conflict is detected
+        const res = await syncPush(stampedConfig);
         if (res.success) {
+          if (res.config) {
+            setConfig(res.config);
+          }
           setSyncStatus({
             status: 'success',
             message: res.message,
@@ -136,16 +223,97 @@ export default function App() {
     }
   };
 
+  // Handle conflict resolution choice ('merge' or 'overwrite')
+  const handleResolveConflict = async (action: 'merge' | 'overwrite') => {
+    if (!conflictInfo) return;
+
+    if (action === 'merge') {
+      setSyncStatus({ status: 'syncing', message: '正在执行两端增量时间戳合并并推送...' });
+      // 1. Two-way Merge logic prioritizing latest timestamps
+      const merged = twoWayMergeConfigs(conflictInfo.localConfig, conflictInfo.remoteConfig);
+      saveConfig(merged);
+      setConfig(merged);
+
+      // 2. Force push the cleanly merged state
+      const pushRes = await syncPushForce(merged);
+      if (pushRes.success) {
+        setSyncStatus({
+          status: 'success',
+          message: '两端合并完成并已安全推送至云端！',
+          lastSyncedAt: Date.now(),
+        });
+      } else {
+        setSyncStatus({
+          status: 'error',
+          message: `合并成功，但推送到云端失败: ${pushRes.message}`,
+          lastSyncedAt: Date.now(),
+        });
+      }
+    } else {
+      // Overwrite: Force push local config to cloud
+      setSyncStatus({ status: 'syncing', message: '正在以本地配置强制覆盖云端...' });
+      const pushRes = await syncPushForce(conflictInfo.localConfig);
+      if (pushRes.success) {
+        setSyncStatus({
+          status: 'success',
+          message: '已使用本地配置强制覆盖云端',
+          lastSyncedAt: Date.now(),
+        });
+      } else {
+        setSyncStatus({
+          status: 'error',
+          message: `覆盖云端失败: ${pushRes.message}`,
+          lastSyncedAt: Date.now(),
+        });
+      }
+    }
+    setConflictModalOpen(false);
+    setConflictInfo(null);
+  };
+
+  // Listen to multi-account switches and reload account-isolated config
+  useEffect(() => {
+    const handleAccountChange = (e: any) => {
+      const targetAccount = e.detail?.account;
+      if (targetAccount) {
+        const loaded = loadConfig(targetAccount);
+        setConfig(loaded);
+        setSyncStatus({
+          status: 'idle',
+          message: `已切换至账号 [${targetAccount}] 数据空间`,
+          lastSyncedAt: loaded.sync.lastSyncedAt,
+        });
+      }
+    };
+    window.addEventListener('lylme_account_changed', handleAccountChange);
+    return () => {
+      window.removeEventListener('lylme_account_changed', handleAccountChange);
+    };
+  }, []);
+
   // Manual trigger sync from UI
   const handleManualSync = async () => {
     if (config.sync.provider === 'none') {
       setSettingsOpen(true);
       return { success: false, message: '请先在配置面板中选择并配置云端同步服务商' };
     }
+
+    const activeUser = getActiveAccount();
+    if (!isSyncAuthenticated(activeUser)) {
+      setSettingsTab('sync');
+      setSettingsOpen(true);
+      return {
+        success: false,
+        requireAuth: true,
+        message: `多云同步需先验证账号权限（当前账号: ${activeUser}，默认密码 123456）`,
+      };
+    }
+
     setSyncStatus({ status: 'syncing', message: '正在从云端拉取最新配置并智能合并...' });
     const res = await syncPull(config);
     if (res.success && res.config) {
       setConfig(res.config);
+      saveConfig(res.config);
       setSyncStatus({
         status: 'success',
         message: res.message,
@@ -160,6 +328,7 @@ export default function App() {
       return res;
     }
   };
+
 
   // Determine dark mode state
   const isDark = Boolean(
@@ -694,6 +863,23 @@ export default function App() {
 
       {/* Music Player Loader (handles safe initialization and single-instance locks) */}
       <MusicPlayerLoader />
+
+      {/* Global Initial Loading Screen for Cloudflare Edge / Cloud Sync */}
+      <GlobalLoading
+        isLoading={isInitialLoading}
+        title={config.title}
+        subtitle={config.subtitle}
+        message="正在从 Cloudflare 边缘接口与云端同步最新配置，避免布局闪烁..."
+        onSkip={() => setIsInitialLoading(false)}
+      />
+
+      {/* Multi-Device Version Conflict Resolution Modal */}
+      <ConflictResolutionModal
+        isOpen={conflictModalOpen}
+        onClose={() => setConflictModalOpen(false)}
+        conflictInfo={conflictInfo}
+        onResolve={handleResolveConflict}
+      />
     </div>
   );
 }

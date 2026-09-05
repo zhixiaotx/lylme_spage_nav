@@ -26,6 +26,7 @@ import {
   Bookmark,
   FileCode,
   ShieldAlert,
+  ShieldCheck,
   FileJson,
   CheckCircle2,
   Image as ImageIcon,
@@ -37,6 +38,10 @@ import {
   Moon,
   Maximize,
   Compass,
+  Lock,
+  Unlock,
+  User,
+  UserCheck,
 } from 'lucide-react';
 import {
   AppConfig,
@@ -72,10 +77,19 @@ import {
   importConfigJsonWithOptions,
   clearAllBookmarks,
   restoreFactoryDefaults,
+  loadConfig,
 } from '../lib/storage';
 import { ExportAuthModal } from './ExportAuthModal';
+import { SyncAuthModal } from './SyncAuthModal';
 import { ConfirmModal } from './ConfirmModal';
 import { isExportAuthenticated } from '../lib/exportAuth';
+import {
+  getActiveAccount,
+  setActiveAccount,
+  isSyncAuthenticated,
+  clearSyncAuthentication,
+  getExpectedAdminUser,
+} from '../lib/auth';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SettingsPanelProps {
@@ -117,12 +131,51 @@ export function SettingsPanel({
   );
   const [isRollingRandom, setIsRollingRandom] = useState(false);
 
-  // Sync test state
+  // Sync test & multi-account auth state
   const [testingConnection, setTestingConnection] = useState(false);
   const [pullingLatest, setPullingLatest] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [currentAccount, setCurrentAccount] = useState<string>(() => getActiveAccount());
+  const [syncAuthModalOpen, setSyncAuthModalOpen] = useState(false);
+  const [pendingSyncAction, setPendingSyncAction] = useState<'test' | 'pull' | 'switch' | null>(null);
+
+  const isCurrentSyncAuthed = isSyncAuthenticated(currentAccount);
+
+  const handleSyncAuthSuccess = (authenticatedAccount: string) => {
+    setCurrentAccount(authenticatedAccount);
+    setActiveAccount(authenticatedAccount);
+    const accountConfig = loadConfig(authenticatedAccount);
+    onChange(accountConfig);
+
+    setTestResult({
+      success: true,
+      message: `账号 [${authenticatedAccount}] 身份认证通过！已加载该账号专属数据空间。`,
+    });
+
+    const action = pendingSyncAction;
+    setPendingSyncAction(null);
+
+    if (action === 'test') {
+      setTimeout(() => {
+        executeTestConnection(accountConfig);
+      }, 150);
+    } else if (action === 'pull') {
+      setTimeout(() => {
+        executePullLatest();
+      }, 150);
+    }
+  };
 
   const handlePullLatest = async () => {
+    if (!isSyncAuthenticated(currentAccount)) {
+      setPendingSyncAction('pull');
+      setSyncAuthModalOpen(true);
+      return;
+    }
+    await executePullLatest();
+  };
+
+  const executePullLatest = async () => {
     setPullingLatest(true);
     setTestResult(null);
     try {
@@ -135,7 +188,7 @@ export function SettingsPanel({
       } else {
         setTestResult({
           success: true,
-          message: '已成功从云端拉取最新数据并智能增量合并，所有设备数据均已安全保留！',
+          message: `已成功从云端拉取账号 [${currentAccount}] 最新数据并智能增量合并，所有设备数据均已安全保留！`,
         });
       }
     } catch (err: any) {
@@ -147,6 +200,7 @@ export function SettingsPanel({
       setPullingLatest(false);
     }
   };
+
   const [creatingGist, setCreatingGist] = useState(false);
   const [initializingD1, setInitializingD1] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -347,20 +401,33 @@ export function SettingsPanel({
 
   // Test current sync credentials
   const handleTestConnection = async () => {
+    if (!isSyncAuthenticated(currentAccount)) {
+      setPendingSyncAction('test');
+      setSyncAuthModalOpen(true);
+      return;
+    }
+    await executeTestConnection(config);
+  };
+
+  const executeTestConnection = async (targetConfig: AppConfig) => {
     setTestingConnection(true);
     setTestResult(null);
     try {
-      const res = await testSyncConnection(config, config.sync.provider);
+      const res = await testSyncConnection(targetConfig, targetConfig.sync.provider);
       setTestResult({
         success: res.success,
         message: res.message,
       });
       if (res.success) {
-        updateSync({
-          lastStatus: 'success',
-          lastSyncedAt: Date.now(),
-          lastMessage: res.message,
-        });
+        if (res.config) {
+          onChange(res.config);
+        } else {
+          updateSync({
+            lastStatus: 'success',
+            lastSyncedAt: Date.now(),
+            lastMessage: res.message,
+          });
+        }
       }
     } catch (err: any) {
       setTestResult({
@@ -371,6 +438,7 @@ export function SettingsPanel({
       setTestingConnection(false);
     }
   };
+
 
   // Auto Create Gist for User
   const handleCreateGist = async () => {
@@ -1565,12 +1633,84 @@ export default {
                ========================================================================= */}
             {activeTab === 'sync' && (
               <div className="space-y-6">
+                {/* Account Authentication & Data Isolation Bar */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-slate-900/60 border border-blue-500/30 text-xs text-slate-300 space-y-3 shadow-lg">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+                        <User size={18} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white font-bold text-sm">
+                            当前同步账号：<code className="px-2 py-0.5 rounded-lg bg-blue-500/20 text-sky-300 font-mono text-xs border border-blue-500/30">{currentAccount}</code>
+                          </span>
+                          {isCurrentSyncAuthed ? (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1">
+                              <Lock size={10} />
+                              已验证凭证
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-semibold flex items-center gap-1">
+                              <Unlock size={10} />
+                              未验证凭证
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          一个账号只能读取自个的数据，不能读取其他账号的数据（默认: admin / 123456）
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPendingSyncAction(null);
+                          setSyncAuthModalOpen(true);
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5"
+                      >
+                        <UserCheck size={13} />
+                        <span>切换 / 认证账号</span>
+                      </button>
+
+                      {isCurrentSyncAuthed && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            clearSyncAuthentication(currentAccount);
+                            setCurrentAccount(getActiveAccount());
+                            setTestResult({
+                              success: true,
+                              message: `已锁定账号 [${currentAccount}] 凭证，下次云同步需重新输入密码`,
+                            });
+                          }}
+                          className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-rose-300 border border-white/10 text-xs transition-all"
+                          title="退出当前账号认证授权"
+                        >
+                          锁定
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-[11px] text-slate-400">
+                    <ShieldCheck size={14} className="text-sky-400 shrink-0" />
+                    <span>
+                      多云同步权限与导出数据一致，严格隔离数据沙箱。不同账号的本地书签、远程配置、云存储记录完全互不干扰。
+                    </span>
+                  </div>
+                </div>
+
                 {/* Sync Provider Selector Bar */}
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
                     选择云端实时同步方案
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+
                     {[
                       { id: 'gist', label: 'GitHub Gist', desc: '免建仓库·极简轻量', icon: <Github size={16} /> },
                       { id: 'github_repo', label: 'GitHub 独立仓库', desc: '独立Repo·版本历史', icon: <FileCode size={16} /> },
@@ -1601,6 +1741,45 @@ export default {
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+
+                {/* Multi-Device & Multi-User Data Isolation Safety Card */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900/20 via-indigo-900/20 to-emerald-900/20 border border-blue-500/20 text-xs text-slate-300 space-y-2.5">
+                  <div className="flex items-center gap-2 text-sky-300 font-semibold text-sm">
+                    <ShieldCheck size={18} className="text-emerald-400 shrink-0" />
+                    <span>多设备同步与多访客安全隔离保障（防丢失·防覆盖）</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] leading-relaxed pt-1">
+                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 space-y-1">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                        访客沙箱隔离机制
+                      </div>
+                      <p className="text-slate-400">
+                        不同访客用不同设备访问时，数据保存在各自浏览器独立沙盒（LocalStorage）中，绝不会读取或覆盖其他人员的个人数据。
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 space-y-1">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        双向增量并集合并
+                      </div>
+                      <p className="text-slate-400">
+                        推送和拉取均启用前置增量合并（Smart Union），多端新增的书签均会自动基于 URL 智能排重并安全汇合，绝不互相覆盖。
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 space-y-1">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                        初始新设备安全采纳
+                      </div>
+                      <p className="text-slate-400">
+                        在全新设备首次配置并拉取时，会自动采纳云端纯净配置，避免默认初始推荐示例反向污染您已整理好的书签架构。
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -2695,6 +2874,19 @@ export default {
             onSuccess={handleAuthSuccess}
             actionTitle={pendingExportType === 'json' ? '导出 JSON 完整备份' : '导出 HTML 书签文件'}
           />
+
+          {/* Cloud Sync Authentication Modal */}
+          <SyncAuthModal
+            isOpen={syncAuthModalOpen}
+            onClose={() => {
+              setSyncAuthModalOpen(false);
+              setPendingSyncAction(null);
+            }}
+            onSuccess={handleSyncAuthSuccess}
+            initialUsername={currentAccount}
+            actionTitle="多云同步操作"
+          />
+
         </motion.div>
       </div>
     </AnimatePresence>

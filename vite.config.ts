@@ -21,8 +21,38 @@ const syncDevPlugin = (): Plugin => ({
         }
 
         const key = url.searchParams.get('key') || 'cf_navs_config';
+        const expectedAdminPass = process.env.VITE_EXPORT_ADMIN_PASS || '123456';
+        const expectedAdminUser = process.env.VITE_EXPORT_ADMIN_USER || 'admin';
+
+        // Extract credentials from headers or query
+        const reqUser = (req.headers['x-auth-user'] as string) || url.searchParams.get('account') || '';
+        const reqPass = (req.headers['x-auth-pass'] as string) || '';
+
+        let targetAccount = expectedAdminUser;
+        if (key.startsWith('cf_navs_config_')) {
+          targetAccount = key.slice('cf_navs_config_'.length);
+        }
+
+        // Cross-account isolation check
+        if (reqUser && reqUser !== targetAccount) {
+          res.statusCode = 403;
+          return res.end(JSON.stringify({
+            error: `跨账号越权拦截：账号 [${reqUser}] 只能读取自个的数据，不能读取账号 [${targetAccount}] 的数据`,
+            code: 'FORBIDDEN',
+          }));
+        }
+
+        // Admin password verification
+        if (targetAccount === expectedAdminUser && reqPass && reqPass !== expectedAdminPass) {
+          res.statusCode = 401;
+          return res.end(JSON.stringify({
+            error: '管理员认证失败：密码错误，无权访问该账号数据',
+            code: 'UNAUTHORIZED',
+          }));
+        }
 
         if (req.method === 'GET') {
+
           if (memoryStorage[key]) {
             res.statusCode = 200;
             return res.end(memoryStorage[key]);

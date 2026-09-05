@@ -23,6 +23,7 @@ export interface NavItem {
   icon?: string;
   description?: string;
   isPinned?: boolean;
+  updatedAt?: number;
 }
 
 export type IconSource =
@@ -64,6 +65,7 @@ export interface NavGroup {
   items: NavItem[];
   parentId?: string; // 父级分类ID (留空或未定义表示顶级分类，有值表示该分类的子分类)
   order?: number;
+  updatedAt?: number;
 }
 
 // Theme Presets: LyLme Original Themes + LyLme-Spage-Palette Themes
@@ -204,6 +206,8 @@ export interface SyncConfig {
 
 export interface AppConfig {
   version: string;
+  updatedAt?: number;
+  revision?: number;
   title: string;
   subtitle: string;
   description: string;
