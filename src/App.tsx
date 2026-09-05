@@ -582,10 +582,9 @@ export default function App() {
 
     if (bgUrl && bgUrl.startsWith('http')) {
       return {
-        backgroundImage: `url(${bgUrl})`,
+        backgroundImage: `url("${bgUrl}")`,
         backgroundSize: fit,
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
+        backgroundPosition: 'center center',
         backgroundRepeat: fit === 'repeat' ? 'repeat' : 'no-repeat',
       };
     }
@@ -603,7 +602,7 @@ export default function App() {
     <div className="min-h-screen relative flex flex-col transition-colors duration-700 font-sans">
       {/* Fixed Fullscreen Background Layer */}
       <div
-        className="fixed inset-0 pointer-events-none transition-all duration-700 z-0"
+        className="fixed inset-0 pointer-events-none transition-opacity duration-500 z-0 overflow-hidden"
         style={backgroundStyle}
       />
 

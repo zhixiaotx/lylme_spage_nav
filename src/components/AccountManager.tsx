@@ -867,8 +867,8 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
 
       {/* 1. Create User Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
@@ -879,7 +879,7 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="text-slate-400 hover:text-slate-700 text-sm"
+                className="text-slate-400 hover:text-slate-700 text-sm p-1 rounded-lg hover:bg-slate-100"
               >
                 ✕
               </button>
@@ -978,8 +978,8 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
 
       {/* 2. Edit User Modal */}
       {showEditModal && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
@@ -990,7 +990,7 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
               <button
                 type="button"
                 onClick={() => setShowEditModal(false)}
-                className="text-slate-400 hover:text-slate-700 text-sm"
+                className="text-slate-400 hover:text-slate-700 text-sm p-1 rounded-lg hover:bg-slate-100"
               >
                 ✕
               </button>
@@ -1056,8 +1056,8 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
 
       {/* 3. Reset Password Modal (Admin to User) */}
       {showResetPassModal && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
@@ -1068,7 +1068,7 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
               <button
                 type="button"
                 onClick={() => setShowResetPassModal(false)}
-                className="text-slate-400 hover:text-slate-700 text-sm"
+                className="text-slate-400 hover:text-slate-700 text-sm p-1 rounded-lg hover:bg-slate-100"
               >
                 ✕
               </button>
@@ -1118,8 +1118,8 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
 
       {/* 4. Self Password Change Modal */}
       {showChangePassModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
@@ -1130,7 +1130,7 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
               <button
                 type="button"
                 onClick={() => setShowChangePassModal(false)}
-                className="text-slate-400 hover:text-slate-700 text-sm"
+                className="text-slate-400 hover:text-slate-700 text-sm p-1 rounded-lg hover:bg-slate-100"
               >
                 ✕
               </button>
@@ -1205,7 +1205,7 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
       {/* 5. Delete User Confirmation Safety Dialog */}
       <ConfirmModal
         isOpen={Boolean(deleteConfirmUser)}
-        onClose={() => setDeleteConfirmUser(null)}
+        onCancel={() => setDeleteConfirmUser(null)}
         onConfirm={handleDeleteUserConfirm}
         title="确认删除该用户账号？"
         message={`您确定要彻底删除账号 [${deleteConfirmUser}] 吗？删除后该用户的本地书签与沙箱配置将被全部清除且无法撤销！`}
@@ -1227,8 +1227,8 @@ export function AccountManager({ onAccountSwitched, onCloseParent }: AccountMana
 
       {/* 7. Comprehensive User Backup & Selective Export Modal */}
       {showSelectBackupModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60">
+          <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 max-h-[92vh] sm:max-h-[90vh] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-2.5">

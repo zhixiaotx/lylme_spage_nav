@@ -52,7 +52,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[9990] flex items-center justify-center p-4 sm:p-6 select-none">
+      <div className="fixed inset-0 z-[9990] flex items-center justify-center p-3 sm:p-6 select-none">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -67,13 +67,13 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-xl bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-2xl z-10 text-slate-900 overflow-hidden"
+          className="relative w-full max-w-xl bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-2xl z-10 text-slate-900 max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-y-auto"
         >
           {/* Close button */}
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1.5 sm:p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
           >
             <X size={18} />
           </button>

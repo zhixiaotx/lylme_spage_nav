@@ -142,7 +142,7 @@ export function LinkEditorModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-4">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -157,11 +157,11 @@ export function LinkEditorModal({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl z-10 text-slate-900"
+          className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl z-10 text-slate-900 max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-y-auto"
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <h3 className="text-lg font-bold text-slate-900">
+          <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100 mb-4 sm:mb-5 shrink-0">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900">
               {mode === 'link'
                 ? editingItem?.item ? '编辑书签导航' : '添加新书签'
                 : editingGroup ? '编辑分类分组' : '新建导航分组'}

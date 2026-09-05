@@ -92,7 +92,7 @@ export const SyncAuthModal: React.FC<SyncAuthModalProps> = ({
             initial={{ opacity: 0, scale: 0.94, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl text-slate-900 relative overflow-hidden"
+            className="w-full max-w-md bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl text-slate-900 relative overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">

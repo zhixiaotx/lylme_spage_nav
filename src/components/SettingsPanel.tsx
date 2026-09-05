@@ -43,6 +43,7 @@ import {
   User,
   UserCheck,
   Users,
+  X,
 } from 'lucide-react';
 import {
   AppConfig,
@@ -739,59 +740,22 @@ export default {
           initial={{ opacity: 0, scale: 0.94, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.94, y: 15 }}
-          className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] text-slate-900"
+          className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh] text-slate-900"
         >
-          {/* Top Bar / Navigation Tabs */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-200 bg-white gap-3">
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <TabButton
-                active={activeTab === 'theme'}
-                onClick={() => setActiveTab('theme')}
-                icon={<Palette size={15} />}
-                label="主题画板"
-              />
-              <TabButton
-                active={activeTab === 'wallpaper'}
-                onClick={() => setActiveTab('wallpaper')}
-                icon={<Wallpaper size={15} />}
-                label="壁纸背景"
-                badge={config.theme.useBingWallpaper ? 'BING' : config.theme.wallpaperType ? config.theme.wallpaperType.toUpperCase() : undefined}
-              />
-              <TabButton
-                active={activeTab === 'sync'}
-                onClick={() => setActiveTab('sync')}
-                icon={<Cloud size={15} />}
-                label="多云同步"
-                badge={config.sync.provider !== 'none' ? config.sync.provider.toUpperCase() : undefined}
-              />
-              <TabButton
-                active={activeTab === 'search'}
-                onClick={() => setActiveTab('search')}
-                icon={<Search size={15} />}
-                label="搜索引擎"
-              />
-              <TabButton
-                active={activeTab === 'serverless'}
-                onClick={() => setActiveTab('serverless')}
-                icon={<Server size={15} />}
-                label="无服务器"
-              />
-              <TabButton
-                active={activeTab === 'backup'}
-                onClick={() => setActiveTab('backup')}
-                icon={<Database size={15} className={activeTab === 'backup' ? 'text-white' : 'text-emerald-600'} />}
-                label="数据管理中心"
-                badge="导入/导出"
-                highlight
-              />
-              <TabButton
-                active={activeTab === 'accounts'}
-                onClick={() => setActiveTab('accounts')}
-                icon={<Users size={15} className={activeTab === 'accounts' ? 'text-white' : 'text-indigo-600'} />}
-                label="用户与后台"
-                badge={isCurrentUserAdmin(currentAccount) ? 'ADMIN' : undefined}
-                highlight={isCurrentUserAdmin(currentAccount)}
-              />
+          {/* Top Bar Header */}
+          <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 border-b border-slate-200 bg-white shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+                <Settings size={18} />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span>六零导航设置中心</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 hidden sm:inline-block">
+                    v{config.version || '2.2.0'}
+                  </span>
+                </h3>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
@@ -810,34 +774,86 @@ export default {
                       : config.theme.preset,
                   });
                 }}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
                 title="全站白天与黑夜模式快速切换"
               >
                 {config.theme.isDarkMode ? (
                   <>
                     <Sun size={14} className="text-amber-500" />
-                    <span>白天模式</span>
+                    <span className="hidden xs:inline sm:inline">白天模式</span>
                   </>
                 ) : (
                   <>
                     <Moon size={14} className="text-sky-600" />
-                    <span>黑夜模式</span>
+                    <span className="hidden xs:inline sm:inline">黑夜模式</span>
                   </>
                 )}
               </button>
 
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors ml-1"
+                className="p-1.5 sm:p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
                 title="关闭设置"
               >
-                ✕
+                <X size={18} />
               </button>
             </div>
           </div>
 
+          {/* Navigation Tabs Strip (Horizontally scrollable on mobile, fluid on desktop) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2 bg-slate-50/80 border-b border-slate-200 overflow-x-auto no-scrollbar shrink-0">
+            <TabButton
+              active={activeTab === 'theme'}
+              onClick={() => setActiveTab('theme')}
+              icon={<Palette size={14} />}
+              label="主题画板"
+            />
+            <TabButton
+              active={activeTab === 'wallpaper'}
+              onClick={() => setActiveTab('wallpaper')}
+              icon={<Wallpaper size={14} />}
+              label="壁纸背景"
+              badge={config.theme.useBingWallpaper ? 'BING' : config.theme.wallpaperType ? config.theme.wallpaperType.toUpperCase() : undefined}
+            />
+            <TabButton
+              active={activeTab === 'sync'}
+              onClick={() => setActiveTab('sync')}
+              icon={<Cloud size={14} />}
+              label="多云同步"
+              badge={config.sync.provider !== 'none' ? config.sync.provider.toUpperCase() : undefined}
+            />
+            <TabButton
+              active={activeTab === 'search'}
+              onClick={() => setActiveTab('search')}
+              icon={<Search size={14} />}
+              label="搜索引擎"
+            />
+            <TabButton
+              active={activeTab === 'serverless'}
+              onClick={() => setActiveTab('serverless')}
+              icon={<Server size={14} />}
+              label="无服务器"
+            />
+            <TabButton
+              active={activeTab === 'backup'}
+              onClick={() => setActiveTab('backup')}
+              icon={<Database size={14} className={activeTab === 'backup' ? 'text-white' : 'text-emerald-600'} />}
+              label="数据管理中心"
+              badge="导入/导出"
+              highlight
+            />
+            <TabButton
+              active={activeTab === 'accounts'}
+              onClick={() => setActiveTab('accounts')}
+              icon={<Users size={14} className={activeTab === 'accounts' ? 'text-white' : 'text-indigo-600'} />}
+              label="用户与后台"
+              badge={isCurrentUserAdmin(currentAccount) ? 'ADMIN' : undefined}
+              highlight={isCurrentUserAdmin(currentAccount)}
+            />
+          </div>
+
           {/* Main Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-5 md:p-8 space-y-8 scrollbar-thin">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 scrollbar-thin">
             {/* =========================================================================
                 TAB 1: PALETTE THEMES
                ========================================================================= */}
