@@ -663,7 +663,7 @@ export default {
                 active={activeTab === 'sync'}
                 onClick={() => setActiveTab('sync')}
                 icon={<Cloud size={15} />}
-                label="多云同步"
+                label="多端云储存"
                 badge={config.sync.provider !== 'none' ? config.sync.provider.toUpperCase() : undefined}
               />
               <TabButton
@@ -1541,7 +1541,7 @@ export default {
                 {/* Sync Provider Selector Bar */}
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
-                    选择云端实时同步方案
+                    选择多端云储存方案
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     {[
@@ -2046,13 +2046,13 @@ export default {
                 {config.sync.provider !== 'none' && (
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      自动同步策略与连接测试
+                      自动云储存策略与连接测试
                     </h4>
 
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <span className="font-semibold text-white block">本地修改后自动推送同步</span>
-                        <span className="text-slate-400">每次添加、编辑或删除书签时，自动防抖同步至云端</span>
+                        <span className="font-semibold text-white block">本地修改后自动推送至云端</span>
+                        <span className="text-slate-400">每次添加、编辑或删除书签时，自动防抖保存至多端云储存</span>
                       </div>
                       <input
                         type="checkbox"
@@ -2071,7 +2071,7 @@ export default {
                           className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50"
                         >
                           <RefreshCw size={13} className={testingConnection ? 'animate-spin' : ''} />
-                          {testingConnection ? '正在测试...' : '测试云端连接 & 立即推送'}
+                          {testingConnection ? '正在测试...' : '测试云储存连接 & 立即推送'}
                         </button>
                         <button
                           type="button"
@@ -2085,7 +2085,7 @@ export default {
 
                       {/* Sync Status Badge */}
                       <div className="text-xs text-slate-400">
-                        最后同步: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleTimeString() : '尚未同步'}
+                        最后储存: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleTimeString() : '尚未储存'}
                       </div>
                     </div>
 
