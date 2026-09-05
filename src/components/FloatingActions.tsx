@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowUp, Sun, Moon, Settings, Wallpaper, Database } from 'lucide-react';
+import { ArrowUp, Sun, Moon, Settings, Wallpaper, Database, Users } from 'lucide-react';
 import { ThemeConfig } from '../types';
 
 interface FloatingActionsProps {
@@ -10,6 +10,7 @@ interface FloatingActionsProps {
   onOpenSettings: () => void;
   onOpenWallpaper?: () => void;
   onOpenBackup?: () => void;
+  onOpenAccounts?: () => void;
 }
 
 export const FloatingActions: React.FC<FloatingActionsProps> = ({
@@ -19,6 +20,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
   onOpenSettings,
   onOpenWallpaper,
   onOpenBackup,
+  onOpenAccounts,
 }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -172,6 +174,30 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
             }`}
           >
             <Database size={20} />
+          </motion.button>
+        </div>
+      )}
+
+      {/* Quick Account & Admin Management Button */}
+      {onOpenAccounts && (
+        <div className="group relative flex items-center pointer-events-auto">
+          <span className="hidden sm:block absolute right-full mr-2.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-900/90 text-white dark:bg-white/90 dark:text-slate-900 shadow-md backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+            多账户与后台管理
+          </span>
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.88 }}
+            onClick={onOpenAccounts}
+            aria-label="打开账户与后台管理"
+            style={floatingButtonStyle}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-transparent ${
+              isDarkMode
+                ? 'text-indigo-400 hover:text-indigo-300 hover:bg-slate-800/80'
+                : 'text-indigo-600 hover:text-indigo-800 hover:bg-slate-100/80 shadow-slate-300/50'
+            }`}
+          >
+            <Users size={20} />
           </motion.button>
         </div>
       )}

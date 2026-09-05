@@ -31,18 +31,20 @@ import {
   Compass,
   Plus,
   Database,
+  Users,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
   const [config, setConfig] = useState<AppConfig>(loadConfig);
+  const [activeAccountName, setActiveAccountName] = useState<string>(() => getActiveAccount());
   const [editMode, setEditMode] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<
-    'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup'
+    'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup' | 'accounts'
   >('theme');
 
-  const handleOpenSettings = (tab?: 'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup') => {
+  const handleOpenSettings = (tab?: 'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup' | 'accounts') => {
     setSettingsTab(tab || 'theme');
     setSettingsOpen(true);
   };
@@ -137,6 +139,18 @@ export default function App() {
       isMounted = false;
       clearTimeout(safetyTimer);
     };
+  }, []);
+
+  // Listen for account changes and refresh local configuration
+  useEffect(() => {
+    const handleAccountChange = () => {
+      const active = getActiveAccount();
+      setActiveAccountName(active);
+      setConfig(loadConfig(active));
+    };
+
+    window.addEventListener('lylme_account_changed', handleAccountChange);
+    return () => window.removeEventListener('lylme_account_changed', handleAccountChange);
   }, []);
 
   // Periodic background sync if enabled
@@ -686,6 +700,21 @@ export default function App() {
             <Database size={16} />
           </button>
 
+          {/* Multi-Account & Admin Management Quick Trigger */}
+          <button
+            type="button"
+            onClick={() => handleOpenSettings('accounts')}
+            className={`px-2.5 py-1 rounded-full transition-all duration-200 flex items-center gap-1.5 text-xs font-semibold ${
+              isDark
+                ? 'text-indigo-300 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30'
+                : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200'
+            }`}
+            title={`当前账号: ${activeAccountName} (点击管理多用户与后台)`}
+          >
+            <Users size={14} />
+            <span className="max-w-[72px] truncate">{activeAccountName}</span>
+          </button>
+
           {/* Settings Trigger */}
           <button
             type="button"
@@ -859,6 +888,7 @@ export default function App() {
         onOpenSettings={() => handleOpenSettings('theme')}
         onOpenWallpaper={() => handleOpenSettings('wallpaper')}
         onOpenBackup={() => handleOpenSettings('backup')}
+        onOpenAccounts={() => handleOpenSettings('accounts')}
       />
 
       {/* Music Player Loader (handles safe initialization and single-instance locks) */}

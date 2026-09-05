@@ -42,6 +42,7 @@ import {
   Unlock,
   User,
   UserCheck,
+  Users,
 } from 'lucide-react';
 import {
   AppConfig,
@@ -82,6 +83,7 @@ import {
 import { ExportAuthModal } from './ExportAuthModal';
 import { SyncAuthModal } from './SyncAuthModal';
 import { ConfirmModal } from './ConfirmModal';
+import { AccountManager } from './AccountManager';
 import { isExportAuthenticated } from '../lib/exportAuth';
 import {
   getActiveAccount,
@@ -89,6 +91,7 @@ import {
   isSyncAuthenticated,
   clearSyncAuthentication,
   getExpectedAdminUser,
+  isCurrentUserAdmin,
 } from '../lib/auth';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -103,7 +106,7 @@ interface SettingsPanelProps {
     message?: string;
     lastSyncedAt?: number;
   };
-  initialTab?: 'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup';
+  initialTab?: 'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup' | 'accounts';
 }
 
 export function SettingsPanel({
@@ -116,7 +119,7 @@ export function SettingsPanel({
   initialTab = 'theme',
 }: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState<
-    'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup'
+    'theme' | 'wallpaper' | 'sync' | 'search' | 'serverless' | 'backup' | 'accounts'
   >(initialTab);
 
   React.useEffect(() => {
@@ -780,6 +783,14 @@ export default {
                 label="数据管理中心"
                 badge="导入/导出"
                 highlight
+              />
+              <TabButton
+                active={activeTab === 'accounts'}
+                onClick={() => setActiveTab('accounts')}
+                icon={<Users size={15} className={activeTab === 'accounts' ? 'text-white' : 'text-indigo-400'} />}
+                label="用户与后台"
+                badge={isCurrentUserAdmin(currentAccount) ? 'ADMIN' : undefined}
+                highlight={isCurrentUserAdmin(currentAccount)}
               />
             </div>
 
@@ -2848,6 +2859,20 @@ export default {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* =========================================================================
+                TAB 7: MULTI-ACCOUNT & ADMIN BACKEND MANAGEMENT
+               ========================================================================= */}
+            {activeTab === 'accounts' && (
+              <AccountManager
+                onAccountSwitched={(newAccount) => {
+                  setCurrentAccount(newAccount);
+                  const newConfig = loadConfig(newAccount);
+                  onChange(newConfig);
+                }}
+                onCloseParent={onClose}
+              />
             )}
           </div>
 
