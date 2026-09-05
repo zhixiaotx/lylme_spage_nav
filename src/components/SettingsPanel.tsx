@@ -83,7 +83,7 @@ interface SettingsPanelProps {
   onClose: () => void;
   config: AppConfig;
   onChange: (config: AppConfig) => void;
-  onManualSync: () => Promise<void>;
+  onManualSync: () => Promise<any>;
   syncStatus: {
     status: 'idle' | 'syncing' | 'success' | 'error';
     message?: string;
@@ -119,7 +119,34 @@ export function SettingsPanel({
 
   // Sync test state
   const [testingConnection, setTestingConnection] = useState(false);
+  const [pullingLatest, setPullingLatest] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handlePullLatest = async () => {
+    setPullingLatest(true);
+    setTestResult(null);
+    try {
+      const res = await onManualSync();
+      if (res && typeof res === 'object' && res.message) {
+        setTestResult({
+          success: Boolean(res.success),
+          message: res.message,
+        });
+      } else {
+        setTestResult({
+          success: true,
+          message: '已成功从云端拉取最新数据并智能增量合并，所有设备数据均已安全保留！',
+        });
+      }
+    } catch (err: any) {
+      setTestResult({
+        success: false,
+        message: `从云端拉取失败: ${err.message || err}`,
+      });
+    } finally {
+      setPullingLatest(false);
+    }
+  };
   const [creatingGist, setCreatingGist] = useState(false);
   const [initializingD1, setInitializingD1] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -663,7 +690,7 @@ export default {
                 active={activeTab === 'sync'}
                 onClick={() => setActiveTab('sync')}
                 icon={<Cloud size={15} />}
-                label="多端云储存"
+                label="多云同步"
                 badge={config.sync.provider !== 'none' ? config.sync.provider.toUpperCase() : undefined}
               />
               <TabButton
@@ -1541,7 +1568,7 @@ export default {
                 {/* Sync Provider Selector Bar */}
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
-                    选择多端云储存方案
+                    选择云端实时同步方案
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     {[
@@ -2046,13 +2073,13 @@ export default {
                 {config.sync.provider !== 'none' && (
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      自动云储存策略与连接测试
+                      自动同步策略与连接测试
                     </h4>
 
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <span className="font-semibold text-white block">本地修改后自动推送至云端</span>
-                        <span className="text-slate-400">每次添加、编辑或删除书签时，自动防抖保存至多端云储存</span>
+                        <span className="font-semibold text-white block">本地修改后自动推送同步</span>
+                        <span className="text-slate-400">每次添加、编辑或删除书签时，自动防抖同步至云端</span>
                       </div>
                       <input
                         type="checkbox"
@@ -2071,21 +2098,28 @@ export default {
                           className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50"
                         >
                           <RefreshCw size={13} className={testingConnection ? 'animate-spin' : ''} />
-                          {testingConnection ? '正在测试...' : '测试云储存连接 & 立即推送'}
+                          {testingConnection ? '正在测试...' : '测试云端连接 & 立即推送'}
                         </button>
                         <button
+                          id="sync-pull-latest-btn"
                           type="button"
-                          onClick={onManualSync}
-                          className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                          onClick={handlePullLatest}
+                          disabled={pullingLatest || syncStatus.status === 'syncing'}
+                          className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 hover:text-white border border-emerald-500/30 hover:border-emerald-500/50 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="从多端云端存储拉取最新配置并智能安全合并，确保跨设备不丢失任何数据"
                         >
-                          <Download size={13} />
-                          从云端拉取最新
+                          {pullingLatest || syncStatus.status === 'syncing' ? (
+                            <RefreshCw size={13} className="animate-spin text-emerald-400" />
+                          ) : (
+                            <Download size={13} className="text-emerald-400" />
+                          )}
+                          <span>{pullingLatest || syncStatus.status === 'syncing' ? '正在拉取最新...' : '从云端拉取最新'}</span>
                         </button>
                       </div>
 
                       {/* Sync Status Badge */}
                       <div className="text-xs text-slate-400">
-                        最后储存: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleTimeString() : '尚未储存'}
+                        最后同步: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleTimeString() : '尚未同步'}
                       </div>
                     </div>
 

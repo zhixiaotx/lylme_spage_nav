@@ -149,14 +149,34 @@ export const mergeWithDefaults = (stored: Partial<AppConfig>): AppConfig => {
 };
 
 /**
+ * Detect if a config's groups are completely unmodified default template groups.
+ */
+export const isUntouchedDefaultGroups = (groups?: any[]): boolean => {
+  if (!groups || groups.length === 0) return true;
+  if (groups.length !== DEFAULT_CONFIG.groups.length) return false;
+  return groups.every((g, idx) => {
+    const def = DEFAULT_CONFIG.groups[idx];
+    if (!def || g.id !== def.id || g.items?.length !== def.items.length) return false;
+    return g.items.every((it: any, itIdx: number) => it.url === def.items[itIdx]?.url);
+  });
+};
+
+/**
  * Smart merge local and remote configurations during cloud sync to prevent multi-device data loss.
  * Combines groups/bookmarks incrementally (union without overwriting/deleting unique items from either device).
  */
 export const smartMergeConfigs = (local: AppConfig, remote: any): AppConfig => {
   const remoteParsed = mergeWithDefaults(remote);
 
-  // 1. Smart merge bookmark groups and items incrementally (Union, preserves all unique local and remote bookmarks)
-  const { mergedGroups } = mergeGroupsIncrementally(local.groups, remoteParsed.groups || []);
+  // 1. Smart merge bookmark groups and items incrementally
+  // If local groups are untouched default and remote has groups, adopt remote directly so a fresh device doesn't resurrect deleted default groups.
+  // Otherwise, perform a lossless union merge preserving all unique items from both devices.
+  const isFreshLocal = isUntouchedDefaultGroups(local.groups);
+  const hasRemoteGroups = Array.isArray(remoteParsed.groups) && remoteParsed.groups.length > 0;
+
+  const mergedGroups = isFreshLocal && hasRemoteGroups
+    ? remoteParsed.groups
+    : mergeGroupsIncrementally(local.groups, remoteParsed.groups || []).mergedGroups;
 
   // 2. Merge search engines
   const existingEngineIds = new Set(local.searchEngines.map((e) => e.id || e.value));

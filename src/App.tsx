@@ -140,9 +140,9 @@ export default function App() {
   const handleManualSync = async () => {
     if (config.sync.provider === 'none') {
       setSettingsOpen(true);
-      return;
+      return { success: false, message: '请先在配置面板中选择并配置云端同步服务商' };
     }
-    setSyncStatus({ status: 'syncing', message: '正在同步...' });
+    setSyncStatus({ status: 'syncing', message: '正在从云端拉取最新配置并智能合并...' });
     const res = await syncPull(config);
     if (res.success && res.config) {
       setConfig(res.config);
@@ -151,11 +151,13 @@ export default function App() {
         message: res.message,
         lastSyncedAt: Date.now(),
       });
+      return res;
     } else {
       setSyncStatus({
         status: 'error',
         message: res.message,
       });
+      return res;
     }
   };
 
