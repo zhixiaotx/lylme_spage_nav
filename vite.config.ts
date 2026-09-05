@@ -53,7 +53,7 @@ const syncDevPlugin = (): Plugin => ({
 
 export default defineConfig(() => {
   return {
-    base: '/',
+    base: './',
     plugins: [react(), tailwindcss(), syncDevPlugin()],
     resolve: {
       alias: {
