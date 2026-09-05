@@ -704,15 +704,14 @@ export default function App() {
           <button
             type="button"
             onClick={() => handleOpenSettings('accounts')}
-            className={`px-2.5 py-1 rounded-full transition-all duration-200 flex items-center gap-1.5 text-xs font-semibold ${
+            className={`p-2 rounded-full transition-all duration-200 ${
               isDark
-                ? 'text-indigo-300 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30'
-                : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200'
+                ? 'text-white/80 hover:text-white hover:bg-white/10'
+                : 'text-slate-700 hover:text-slate-950 hover:bg-slate-900/5'
             }`}
-            title={`当前账号: ${activeAccountName} (点击管理多用户与后台)`}
+            title={`多账户与后台管理 (当前账号: ${activeAccountName})`}
           >
-            <Users size={14} />
-            <span className="max-w-[72px] truncate">{activeAccountName}</span>
+            <Users size={16} />
           </button>
 
           {/* Settings Trigger */}

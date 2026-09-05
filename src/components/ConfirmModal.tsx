@@ -29,38 +29,31 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md select-none">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 select-none">
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 15 }}
           transition={{ duration: 0.2 }}
-          className={`relative bg-slate-900 border ${
-            danger ? 'border-rose-500/40' : 'border-amber-500/40'
-          } rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-center overflow-hidden`}
+          className={`relative bg-white border ${
+            danger ? 'border-rose-200' : 'border-amber-200'
+          } rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-center overflow-hidden text-slate-900`}
         >
-          {/* Top subtle glow */}
-          <div
-            className={`absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-24 rounded-full blur-2xl pointer-events-none ${
-              danger ? 'bg-rose-500/20' : 'bg-amber-500/20'
-            }`}
-          />
-
           {/* Close button */}
           <button
             type="button"
             onClick={onCancel}
-            className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X size={16} />
           </button>
 
           {/* Icon Badge */}
           <div
-            className={`w-12 h-12 rounded-2xl mx-auto flex items-center justify-center border shadow-lg ${
+            className={`w-12 h-12 rounded-2xl mx-auto flex items-center justify-center border shadow-sm ${
               danger
-                ? 'bg-rose-500/20 border-rose-500/40 text-rose-400'
-                : 'bg-amber-500/20 border-amber-500/40 text-amber-400'
+                ? 'bg-rose-50 border-rose-200 text-rose-600'
+                : 'bg-amber-50 border-amber-200 text-amber-600'
             }`}
           >
             {iconType === 'danger' ? (
@@ -72,8 +65,8 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
           {/* Modal Content */}
           <div className="space-y-2">
-            <h3 className="text-base font-bold text-white tracking-tight">{title}</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">{message}</p>
+            <h3 className="text-base font-bold text-slate-900 tracking-tight">{title}</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">{message}</p>
           </div>
 
           {/* Action Buttons */}
@@ -81,17 +74,17 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors"
             >
               {cancelText}
             </button>
             <button
               type="button"
               onClick={onConfirm}
-              className={`px-5 py-2.5 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-lg ${
+              className={`px-5 py-2.5 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-md ${
                 danger
-                  ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/30'
-                  : 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/30'
+                  ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/25'
+                  : 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/25'
               }`}
             >
               {danger ? <Trash2 size={14} /> : <RotateCcw size={14} />}

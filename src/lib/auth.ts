@@ -691,15 +691,20 @@ export function switchActiveAccount(targetAccount: string): { success: boolean; 
 }
 
 /**
- * Export all registered accounts and their sandboxed configuration data into a single JSON backup
+ * Export selected registered accounts and their sandboxed configuration data into a JSON backup
  */
-export function exportAllAccountsAndDataJson(): string {
-  const accounts = getRegisteredAccounts();
+export function exportSelectedAccountsAndDataJson(usernames?: string[]): string {
+  const allAccounts = getRegisteredAccounts();
+  const targetAccounts = usernames && usernames.length > 0
+    ? allAccounts.filter((a) => usernames.some((u) => u.toLowerCase() === a.username.toLowerCase()))
+    : allAccounts;
+
   const exportPayload: {
     meta: {
       version: string;
       exportTime: number;
       accountCount: number;
+      exportedUsers: string[];
     };
     accounts: RegisteredAccount[];
     sandboxes: Record<string, any>;
@@ -707,13 +712,14 @@ export function exportAllAccountsAndDataJson(): string {
     meta: {
       version: '2.0.0',
       exportTime: Date.now(),
-      accountCount: accounts.length,
+      accountCount: targetAccounts.length,
+      exportedUsers: targetAccounts.map((a) => a.username),
     },
-    accounts,
+    accounts: targetAccounts,
     sandboxes: {},
   };
 
-  for (const acc of accounts) {
+  for (const acc of targetAccounts) {
     const key = getAccountStorageKey(acc.username);
     try {
       const raw = localStorage.getItem(key);
@@ -726,6 +732,20 @@ export function exportAllAccountsAndDataJson(): string {
   }
 
   return JSON.stringify(exportPayload, null, 2);
+}
+
+/**
+ * Export a single account and its sandboxed configuration data into a JSON backup
+ */
+export function exportSingleAccountAndDataJson(username: string): string {
+  return exportSelectedAccountsAndDataJson([username]);
+}
+
+/**
+ * Export all registered accounts and their sandboxed configuration data into a single JSON backup
+ */
+export function exportAllAccountsAndDataJson(): string {
+  return exportSelectedAccountsAndDataJson();
 }
 
 /**

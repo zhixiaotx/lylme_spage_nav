@@ -731,7 +731,7 @@ export default {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/75 backdrop-blur-md"
+          className="absolute inset-0 bg-black/60"
         />
 
         {/* Modal Shell */}
@@ -739,10 +739,10 @@ export default {
           initial={{ opacity: 0, scale: 0.94, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.94, y: 15 }}
-          className="relative w-full max-w-4xl bg-slate-950 border border-white/20 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] text-slate-100"
+          className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] text-slate-900"
         >
           {/* Top Bar / Navigation Tabs */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/10 bg-slate-900/90 backdrop-blur-md gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-200 bg-white gap-3">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <TabButton
                 active={activeTab === 'theme'}
@@ -779,7 +779,7 @@ export default {
               <TabButton
                 active={activeTab === 'backup'}
                 onClick={() => setActiveTab('backup')}
-                icon={<Database size={15} className={activeTab === 'backup' ? 'text-white' : 'text-emerald-400'} />}
+                icon={<Database size={15} className={activeTab === 'backup' ? 'text-white' : 'text-emerald-600'} />}
                 label="数据管理中心"
                 badge="导入/导出"
                 highlight
@@ -787,7 +787,7 @@ export default {
               <TabButton
                 active={activeTab === 'accounts'}
                 onClick={() => setActiveTab('accounts')}
-                icon={<Users size={15} className={activeTab === 'accounts' ? 'text-white' : 'text-indigo-400'} />}
+                icon={<Users size={15} className={activeTab === 'accounts' ? 'text-white' : 'text-indigo-600'} />}
                 label="用户与后台"
                 badge={isCurrentUserAdmin(currentAccount) ? 'ADMIN' : undefined}
                 highlight={isCurrentUserAdmin(currentAccount)}
@@ -810,17 +810,17 @@ export default {
                       : config.theme.preset,
                   });
                 }}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
                 title="全站白天与黑夜模式快速切换"
               >
                 {config.theme.isDarkMode ? (
                   <>
-                    <Sun size={14} className="text-amber-400" />
+                    <Sun size={14} className="text-amber-500" />
                     <span>白天模式</span>
                   </>
                 ) : (
                   <>
-                    <Moon size={14} className="text-sky-300" />
+                    <Moon size={14} className="text-sky-600" />
                     <span>黑夜模式</span>
                   </>
                 )}
@@ -828,7 +828,7 @@ export default {
 
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors ml-1"
+                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors ml-1"
                 title="关闭设置"
               >
                 ✕
@@ -844,14 +844,14 @@ export default {
             {activeTab === 'theme' && (
               <div className="space-y-8">
                 {/* 1. Global Day / Night Mode Selector */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                        {config.theme.isDarkMode ? <Moon size={16} className="text-indigo-400" /> : <Sun size={16} className="text-amber-400" />}
+                      <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        {config.theme.isDarkMode ? <Moon size={16} className="text-indigo-600" /> : <Sun size={16} className="text-amber-500" />}
                         <span>全站昼夜模式 (Day / Night Mode)</span>
                       </h4>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs text-slate-600 mt-0.5">
                         全站统一光暗对比度自适应调节，涵盖搜索框、导航卡片、时钟组件、背景毛玻璃与对话框
                       </p>
                     </div>
@@ -870,20 +870,20 @@ export default {
                       }
                       className={`flex items-center justify-between p-4 rounded-xl border text-left transition-all ${
                         !config.theme.isDarkMode
-                          ? 'bg-amber-500/15 border-amber-400 ring-2 ring-amber-400/40 text-amber-200 shadow-md shadow-amber-500/10'
-                          : 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300'
+                          ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-400/40 text-amber-950 shadow-sm'
+                          : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
                           <Sun size={20} />
                         </div>
                         <div>
-                          <span className="text-sm font-bold block text-white">☀️ 白天明亮模式 (Day)</span>
-                          <span className="text-xs text-slate-400">轻快通透，高对比度清爽阅读</span>
+                          <span className="text-sm font-bold block text-slate-900">☀️ 白天明亮模式 (Day)</span>
+                          <span className="text-xs text-slate-600">轻快通透，高对比度清爽阅读</span>
                         </div>
                       </div>
-                      {!config.theme.isDarkMode && <Check size={18} className="text-amber-400 stroke-[3]" />}
+                      {!config.theme.isDarkMode && <Check size={18} className="text-amber-600 stroke-[3]" />}
                     </button>
 
                     <button
@@ -898,20 +898,20 @@ export default {
                       }
                       className={`flex items-center justify-between p-4 rounded-xl border text-left transition-all ${
                         config.theme.isDarkMode
-                          ? 'bg-indigo-500/20 border-indigo-400 ring-2 ring-indigo-400/40 text-indigo-200 shadow-md shadow-indigo-500/10'
-                          : 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300'
+                          ? 'bg-indigo-50 border-indigo-300 ring-2 ring-indigo-400/40 text-indigo-950 shadow-sm'
+                          : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
                           <Moon size={20} />
                         </div>
                         <div>
-                          <span className="text-sm font-bold block text-white">🌙 黑夜深色模式 (Night)</span>
-                          <span className="text-xs text-slate-400">沉浸暗夜，深邃护眼质感</span>
+                          <span className="text-sm font-bold block text-slate-900">🌙 黑夜深色模式 (Night)</span>
+                          <span className="text-xs text-slate-600">沉浸暗夜，深邃护眼质感</span>
                         </div>
                       </div>
-                      {config.theme.isDarkMode && <Check size={18} className="text-indigo-400 stroke-[3]" />}
+                      {config.theme.isDarkMode && <Check size={18} className="text-indigo-600 stroke-[3]" />}
                     </button>
                   </div>
                 </div>
@@ -920,22 +920,22 @@ export default {
                 <div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                     <div>
-                      <label className="text-sm font-bold text-white flex items-center gap-2">
-                        <Palette size={16} className="text-sky-400" />
+                      <label className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <Palette size={16} className="text-sky-600" />
                         主题模版库 (含原版官方主题与 Palette 调色盘全集)
                       </label>
-                      <span className="text-xs text-slate-400">保留 LyLme Spage Nav 原版经典主题，完整集成 Palette 高颜值风格</span>
+                      <span className="text-xs text-slate-600">保留 LyLme Spage Nav 原版经典主题，完整集成 Palette 高颜值风格</span>
                     </div>
 
                     {/* Category Filter Tabs */}
-                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 self-start sm:self-auto">
+                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 self-start sm:self-auto">
                       <button
                         type="button"
                         onClick={() => setThemeCategoryFilter('all')}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                           themeCategoryFilter === 'all'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'text-slate-400 hover:text-white'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         全部 ({Object.values(PALETTE_THEMES).length})
@@ -943,10 +943,10 @@ export default {
                       <button
                         type="button"
                         onClick={() => setThemeCategoryFilter('official')}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                           themeCategoryFilter === 'official'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'text-slate-400 hover:text-white'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         原版官方 ({Object.values(PALETTE_THEMES).filter((t) => t.category === 'official').length})
@@ -954,10 +954,10 @@ export default {
                       <button
                         type="button"
                         onClick={() => setThemeCategoryFilter('palette')}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                           themeCategoryFilter === 'palette'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'text-slate-400 hover:text-white'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         Palette 调色盘 ({Object.values(PALETTE_THEMES).filter((t) => t.category === 'palette').length})
@@ -981,8 +981,8 @@ export default {
                             onClick={() => selectPreset(themeMeta.id)}
                             className={`relative flex flex-col p-3 rounded-2xl border text-left transition-all duration-200 group overflow-hidden ${
                               isSelected
-                                ? 'bg-blue-600/20 border-blue-500 ring-2 ring-blue-500/40 shadow-lg shadow-blue-500/10'
-                                : 'bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10'
+                                ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-500/40 shadow-md'
+                                : 'bg-white border-slate-200 hover:border-blue-300 hover:bg-slate-50 shadow-2xs'
                             }`}
                           >
                             {/* Color preview swatch and badge */}
@@ -991,7 +991,7 @@ export default {
                                 {themeMeta.previewColors.slice(0, 4).map((color, idx) => (
                                   <div
                                     key={idx}
-                                    className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-inner"
+                                    className="w-3.5 h-3.5 rounded-full border border-slate-300 shadow-inner"
                                     style={{ backgroundColor: color }}
                                   />
                                 ))}
@@ -1000,8 +1000,8 @@ export default {
                                 <span
                                   className={`text-[9px] px-1.5 py-0.5 rounded-md font-semibold tracking-tight ${
                                     themeMeta.category === 'official'
-                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                      : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                      : 'bg-sky-100 text-sky-800 border border-sky-200'
                                   }`}
                                 >
                                   {themeMeta.badge}
@@ -1009,18 +1009,18 @@ export default {
                               )}
                             </div>
 
-                            <span className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
+                            <span className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                               {themeMeta.nameZh}
                             </span>
-                            <span className="text-[10px] text-slate-400 truncate mt-0.5">
+                            <span className="text-[10px] text-slate-600 truncate mt-0.5 font-medium">
                               {themeMeta.name}
                             </span>
-                            <span className="text-[10px] text-slate-500 line-clamp-1 mt-1 opacity-80" title={themeMeta.description}>
+                            <span className="text-[10px] text-slate-500 line-clamp-1 mt-1 font-normal" title={themeMeta.description}>
                               {themeMeta.description}
                             </span>
 
                             {isSelected && (
-                              <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white shadow">
+                              <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-white shadow">
                                 <Check size={10} />
                               </div>
                             )}
@@ -1031,14 +1031,14 @@ export default {
                 </div>
 
                 {/* Wallpaper & Background Studio Quick Access */}
-                <div className="bg-gradient-to-r from-sky-950/40 to-indigo-950/40 border border-sky-500/20 rounded-2xl p-5 space-y-4">
+                <div className="bg-sky-50 border border-sky-200 rounded-2xl p-5 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                      <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                        <Wallpaper size={16} className="text-sky-400" />
+                      <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <Wallpaper size={16} className="text-sky-600" />
                         <span>壁纸与背景设定</span>
                       </h4>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs text-slate-600 mt-0.5">
                         当前模式: {config.theme.useBingWallpaper ? '微软 Bing 每日高清' : config.theme.wallpaperType ? config.theme.wallpaperType.toUpperCase() : '主题默认背景'}
                       </p>
                     </div>
@@ -1046,7 +1046,7 @@ export default {
                     <button
                       type="button"
                       onClick={() => setActiveTab('wallpaper')}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5 shadow transition-all shrink-0"
+                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5 shadow-sm transition-all shrink-0"
                     >
                       <Sparkles size={14} />
                       <span>打开高清壁纸工作室</span>
@@ -1054,10 +1054,10 @@ export default {
                   </div>
 
                   {/* Bing Wallpaper Quick Switch */}
-                  <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                  <div className="flex items-center justify-between pt-3 border-t border-sky-200/80">
                     <div>
-                      <span className="text-xs font-semibold text-white block">快速开启 Bing 每日高清壁纸</span>
-                      <span className="text-[11px] text-slate-400">每天随微软 Bing 官方主页自动更新精选风景</span>
+                      <span className="text-xs font-semibold text-slate-900 block">快速开启 Bing 每日高清壁纸</span>
+                      <span className="text-[11px] text-slate-600">每天随微软 Bing 官方主页自动更新精选风景</span>
                     </div>
                     <button
                       type="button"
@@ -1073,11 +1073,11 @@ export default {
                         }
                       }}
                       className={`w-12 h-6 rounded-full transition-colors relative ${
-                        config.theme.useBingWallpaper ? 'bg-sky-600' : 'bg-white/20'
+                        config.theme.useBingWallpaper ? 'bg-sky-600' : 'bg-slate-300'
                       }`}
                     >
                       <div
-                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${
+                        className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${
                           config.theme.useBingWallpaper ? 'left-7' : 'left-1'
                         }`}
                       />
@@ -1088,16 +1088,16 @@ export default {
                 {/* Visual Glassmorphism & Layout Options */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Glass Card Blur & Opacity */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       亚克力毛玻璃与质感
                     </h4>
 
                     {/* Blur */}
                     <div>
                       <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-slate-300">磨砂模糊度 (Blur)</span>
-                        <span className="font-mono text-sky-400">{config.theme.blur}px</span>
+                        <span className="text-slate-700 font-medium">磨砂模糊度 (Blur)</span>
+                        <span className="font-mono text-sky-600 font-bold">{config.theme.blur}px</span>
                       </div>
                       <input
                         type="range"
@@ -1105,15 +1105,15 @@ export default {
                         max="30"
                         value={config.theme.blur}
                         onChange={(e) => updateTheme({ blur: parseInt(e.target.value) })}
-                        className="w-full accent-blue-500 cursor-pointer"
+                        className="w-full accent-blue-600 cursor-pointer"
                       />
                     </div>
 
                     {/* Opacity */}
                     <div>
                       <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-slate-300">卡片不透明度 (Opacity)</span>
-                        <span className="font-mono text-sky-400">{Math.round(config.theme.opacity * 100)}%</span>
+                        <span className="text-slate-700 font-medium">卡片不透明度 (Opacity)</span>
+                        <span className="font-mono text-sky-600 font-bold">{Math.round(config.theme.opacity * 100)}%</span>
                       </div>
                       <input
                         type="range"
@@ -1121,23 +1121,23 @@ export default {
                         max="100"
                         value={Math.round(config.theme.opacity * 100)}
                         onChange={(e) => updateTheme({ opacity: parseInt(e.target.value) / 100 })}
-                        className="w-full accent-blue-500 cursor-pointer"
+                        className="w-full accent-blue-600 cursor-pointer"
                       />
                     </div>
 
                     {/* Card Rounded Radius */}
                     <div>
-                      <span className="text-xs text-slate-300 block mb-2">卡片圆角风格</span>
+                      <span className="text-xs text-slate-700 font-medium block mb-2">卡片圆角风格</span>
                       <div className="grid grid-cols-3 gap-2">
                         {(['rounded-xl', 'rounded-2xl', 'rounded-3xl'] as const).map((rad) => (
                           <button
                             key={rad}
                             type="button"
                             onClick={() => updateTheme({ cardBorderRadius: rad })}
-                            className={`py-1.5 text-xs font-medium rounded-xl border transition-all ${
+                            className={`py-1.5 text-xs font-semibold rounded-xl border transition-all ${
                               config.theme.cardBorderRadius === rad
-                                ? 'bg-blue-600/30 border-blue-500 text-white'
-                                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'bg-white border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-100'
                             }`}
                           >
                             {rad === 'rounded-xl' ? '轻度圆角' : rad === 'rounded-2xl' ? '标准圆角' : '胶囊大圆角'}
@@ -1148,14 +1148,14 @@ export default {
                   </div>
 
                   {/* Layout & Display Options */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       排版模式与组件开关
                     </h4>
 
                     {/* Layout Mode */}
                     <div>
-                      <span className="text-xs text-slate-300 block mb-2">导航排版模式</span>
+                      <span className="text-xs text-slate-700 font-medium block mb-2">导航排版模式</span>
                       <div className="grid grid-cols-3 gap-2">
                         {[
                           { id: 'grid', label: '居中网格' },
@@ -1166,10 +1166,10 @@ export default {
                             key={m.id}
                             type="button"
                             onClick={() => updateTheme({ layoutMode: m.id as LayoutMode })}
-                            className={`py-1.5 text-xs font-medium rounded-xl border transition-all ${
+                            className={`py-1.5 text-xs font-semibold rounded-xl border transition-all ${
                               config.theme.layoutMode === m.id
-                                ? 'bg-blue-600/30 border-blue-500 text-white'
-                                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'bg-white border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-100'
                             }`}
                           >
                             {m.label}
@@ -1180,7 +1180,7 @@ export default {
 
                     {/* Clock toggle */}
                     <div className="flex items-center justify-between text-xs pt-1">
-                      <span className="text-slate-300">显示数字时钟与日期</span>
+                      <span className="text-slate-800 font-medium">显示数字时钟与日期</span>
                       <input
                         type="checkbox"
                         checked={config.theme.showClock}
@@ -1191,7 +1191,7 @@ export default {
 
                     {/* Hitokoto toggle */}
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-300">显示“一言”哲学每日箴言</span>
+                      <span className="text-slate-800 font-medium">显示“一言”哲学每日箴言</span>
                       <input
                         type="checkbox"
                         checked={config.theme.showHitokoto}
@@ -1202,7 +1202,7 @@ export default {
 
                     {/* Open in new tab */}
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-300">链接新标签页打开</span>
+                      <span className="text-slate-800 font-medium">链接新标签页打开</span>
                       <input
                         type="checkbox"
                         checked={config.theme.openInNewTab}
@@ -1214,14 +1214,14 @@ export default {
                 </div>
 
                 {/* Favicon Multi-Source & Automatic Fetching Settings */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                        <Sparkles size={14} className="text-sky-400" />
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                        <Sparkles size={14} className="text-sky-600" />
                         <span>自动抓取 Favicon 图标与失败首字母占位</span>
                       </h4>
-                      <p className="text-[11px] text-slate-400 mt-1">
+                      <p className="text-[11px] text-slate-600 mt-1">
                         集成 20+ 个国内外高质量聚合解析源，智能多重故障回退，若无图标或抓取失败自动基于域名生成彩色渐变首字母头像。
                       </p>
                     </div>
@@ -1229,14 +1229,14 @@ export default {
 
                   {/* Preferred Icon Source Dropdown */}
                   <div>
-                    <label className="text-xs text-slate-300 block mb-2 font-medium">默认图标抓取源 (Default Icon Source)</label>
+                    <label className="text-xs text-slate-700 block mb-2 font-semibold">默认图标抓取源 (Default Icon Source)</label>
                     <select
                       value={config.theme.iconSource || 'favicon_im'}
                       onChange={(e) => updateTheme({ iconSource: e.target.value as IconSource })}
-                      className="w-full bg-white/10 border border-white/20 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-blue-400 outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 outline-none"
                     >
                       {iconSources.map((s) => (
-                        <option key={s.value} value={s.value} className="bg-slate-900 text-white">
+                        <option key={s.value} value={s.value} className="bg-white text-slate-900">
                           {s.label} — {s.detail}
                         </option>
                       ))}
@@ -1244,10 +1244,10 @@ export default {
                   </div>
 
                   {/* Batch Refresh Button */}
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
                     <div>
-                      <span className="text-xs text-white block font-medium">批量探测与更新所有书签图标</span>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-xs text-slate-900 block font-semibold">批量探测与更新所有书签图标</span>
+                      <span className="text-[11px] text-slate-600">
                         使用当前首选源遍历所有书签，重新检测并补全丢失的图标
                       </span>
                     </div>
@@ -1255,7 +1255,7 @@ export default {
                       type="button"
                       disabled={batchScanning}
                       onClick={handleBatchDetectIcons}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white flex items-center gap-1.5 shadow transition-all shrink-0 ml-3"
+                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white flex items-center gap-1.5 shadow-sm transition-all shrink-0 ml-3"
                     >
                       <RefreshCw size={13} className={batchScanning ? 'animate-spin' : ''} />
                       <span>{batchScanning ? '正在逐一探测中...' : '一键批量刷新'}</span>
@@ -1263,16 +1263,16 @@ export default {
                   </div>
 
                   {batchDoneMsg && (
-                    <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
-                      <Check size={14} />
+                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                      <Check size={14} className="text-emerald-600" />
                       <span>{batchDoneMsg}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Custom CSS */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-2">
-                  <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-2">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <span>自定义 CSS 样式注入 (兼容 LyLme Spage Nav 自定义代码)</span>
                   </label>
                   <textarea
@@ -1280,7 +1280,7 @@ export default {
                     value={config.theme.customCss || ''}
                     onChange={(e) => updateTheme({ customCss: e.target.value })}
                     placeholder="/* 输入自定义 CSS，例如 .nav-card { filter: contrast(1.1); } */"
-                    className="w-full font-mono text-xs bg-black/50 border border-white/15 rounded-xl p-3 text-emerald-400 placeholder:text-slate-600 outline-none focus:border-blue-400"
+                    className="w-full font-mono text-xs bg-slate-900 border border-slate-800 rounded-xl p-3 text-emerald-400 placeholder:text-slate-500 outline-none focus:border-blue-400"
                   />
                 </div>
               </div>
@@ -1292,13 +1292,13 @@ export default {
             {activeTab === 'wallpaper' && (
               <div className="space-y-8">
                 {/* Wallpaper Studio Quick Action Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gradient-to-r from-sky-950/50 to-indigo-950/50 border border-sky-500/20 rounded-2xl backdrop-blur-md">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-sky-50 border border-sky-200 rounded-2xl">
                   <div className="space-y-0.5">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Wallpaper size={16} className="text-sky-400" />
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Wallpaper size={16} className="text-sky-600" />
                       <span>高清壁纸工作室 (Wallpaper Studio)</span>
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-600">
                       支持微软 Bing 每日自动更新、精选 4K 超清图库、赛博渐变色以及自定义静态直链。
                     </p>
                   </div>
@@ -1309,7 +1309,7 @@ export default {
                       type="button"
                       onClick={handleRandomWallpaper}
                       disabled={isRollingRandom}
-                      className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 active:scale-95 text-white transition-all flex items-center gap-1.5 shadow-lg shadow-sky-600/20 disabled:opacity-50"
+                      className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 active:scale-95 text-white transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
                       title="从精选图库随机挑选一张壁纸"
                     >
                       <Dices size={15} className={isRollingRandom ? 'animate-spin' : ''} />
@@ -1319,14 +1319,14 @@ export default {
                 </div>
 
                 {/* 1. Bing Daily Wallpaper Section */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-sm font-bold text-white flex items-center gap-2">
-                        <Globe size={15} className="text-sky-400" />
+                      <span className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <Globe size={15} className="text-sky-600" />
                         <span>微软 Bing 每日高清壁纸</span>
                       </span>
-                      <span className="text-xs text-slate-400 block mt-0.5">
+                      <span className="text-xs text-slate-600 block mt-0.5">
                         与微软 Bing 官方主页同步，每日零点自动更新全球精选风景大片
                       </span>
                     </div>
@@ -1345,11 +1345,11 @@ export default {
                         }
                       }}
                       className={`w-12 h-6 rounded-full transition-colors relative ${
-                        config.theme.useBingWallpaper ? 'bg-sky-600' : 'bg-white/20'
+                        config.theme.useBingWallpaper ? 'bg-sky-600' : 'bg-slate-300'
                       }`}
                     >
                       <div
-                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${
+                        className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${
                           config.theme.useBingWallpaper ? 'left-7' : 'left-1'
                         }`}
                       />
@@ -1357,15 +1357,15 @@ export default {
                   </div>
 
                   {config.theme.useBingWallpaper && (
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/10 flex-wrap">
-                      <span className="text-xs text-slate-400">Bing 分辨率模式:</span>
+                    <div className="flex items-center gap-2 pt-2 border-t border-slate-200 flex-wrap">
+                      <span className="text-xs text-slate-700 font-medium">Bing 分辨率模式:</span>
                       <button
                         type="button"
                         onClick={() => handleToggleBing('1920')}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                           !config.theme.background?.includes('resolution=3840')
-                            ? 'bg-sky-600 text-white shadow'
-                            : 'bg-white/10 text-slate-300 hover:text-white'
+                            ? 'bg-sky-600 text-white shadow-sm'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
                         1080P 高清 (推荐·加载快)
@@ -1373,10 +1373,10 @@ export default {
                       <button
                         type="button"
                         onClick={() => handleToggleBing('UHD')}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                           config.theme.background?.includes('resolution=3840')
-                            ? 'bg-sky-600 text-white shadow'
-                            : 'bg-white/10 text-slate-300 hover:text-white'
+                            ? 'bg-sky-600 text-white shadow-sm'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
                         4K UHD 超清原图 (高画质)
@@ -1389,11 +1389,11 @@ export default {
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                        <ImageIcon size={16} className="text-indigo-400" />
+                      <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <ImageIcon size={16} className="text-indigo-600" />
                         <span>精选 4K 超清艺术画廊</span>
                       </h4>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-600">
                         涵盖自然、动漫、赛博朋克、建筑等全类别 2560+ 分辨率高清壁纸
                       </span>
                     </div>
@@ -1405,10 +1405,10 @@ export default {
                           key={cat.id}
                           type="button"
                           onClick={() => setWallpaperCategoryFilter(cat.id)}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                             wallpaperCategoryFilter === cat.id
-                              ? 'bg-indigo-600 text-white shadow'
-                              : 'bg-white/10 text-slate-400 hover:text-white'
+                              ? 'bg-indigo-600 text-white shadow-sm'
+                              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                           }`}
                         >
                           {cat.name}
@@ -1435,8 +1435,8 @@ export default {
                           onClick={() => selectCuratedWallpaper(item)}
                           className={`group relative aspect-video rounded-xl overflow-hidden border transition-all duration-200 text-left ${
                             isSelected
-                              ? 'border-indigo-400 ring-2 ring-indigo-400/50 shadow-lg shadow-indigo-500/20'
-                              : 'border-white/10 hover:border-white/40'
+                              ? 'border-indigo-500 ring-2 ring-indigo-400/50 shadow-md'
+                              : 'border-slate-200 hover:border-indigo-300 shadow-2xs'
                           }`}
                         >
                           <img
@@ -1453,7 +1453,7 @@ export default {
                           </div>
 
                           {isSelected && (
-                            <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center text-white shadow-md">
+                            <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-white shadow-md">
                               <Check size={12} />
                             </div>
                           )}
@@ -1466,9 +1466,9 @@ export default {
                 {/* 3. Modern Gradients & Solid Palettes */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Gradients */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                      <Layers size={14} className="text-sky-400" />
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                      <Layers size={14} className="text-sky-600" />
                       <span>现代多色渐变</span>
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
@@ -1484,19 +1484,19 @@ export default {
                             onClick={() => selectGradient(grad)}
                             className={`p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group ${
                               isSelected
-                                ? 'border-sky-400 ring-2 ring-sky-400/40 shadow-md'
-                                : 'border-white/10 hover:border-white/30'
+                                ? 'border-sky-500 ring-2 ring-sky-400/40 bg-sky-50 shadow-sm'
+                                : 'border-slate-200 bg-white hover:border-slate-300'
                             }`}
                           >
                             <div
-                              className="h-10 w-full rounded-lg mb-1.5 border border-white/10"
+                              className="h-10 w-full rounded-lg mb-1.5 border border-slate-200"
                               style={{ background: grad.css }}
                             />
-                            <span className="text-[11px] font-medium text-slate-200 block truncate">
+                            <span className="text-[11px] font-semibold text-slate-800 block truncate">
                               {grad.name}
                             </span>
                             {isSelected && (
-                              <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-sky-500 flex items-center justify-center text-white text-[10px]">
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-sky-600 flex items-center justify-center text-white text-[10px]">
                                 <Check size={10} />
                               </div>
                             )}
@@ -1507,9 +1507,9 @@ export default {
                   </div>
 
                   {/* Solid Colors */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                      <SlidersHorizontal size={14} className="text-sky-400" />
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                      <SlidersHorizontal size={14} className="text-sky-600" />
                       <span>极简纯色背景</span>
                     </h4>
                     <div className="grid grid-cols-4 gap-2">
@@ -1525,19 +1525,19 @@ export default {
                             onClick={() => selectSolid(solid)}
                             className={`p-2 rounded-xl border text-center transition-all relative group ${
                               isSelected
-                                ? 'border-sky-400 ring-2 ring-sky-400/40 shadow-md'
-                                : 'border-white/10 hover:border-white/30'
+                                ? 'border-sky-500 ring-2 ring-sky-400/40 bg-sky-50 shadow-sm'
+                                : 'border-slate-200 bg-white hover:border-slate-300'
                             }`}
                           >
                             <div
-                              className="h-8 w-full rounded-lg mb-1 border border-white/15"
+                              className="h-8 w-full rounded-lg mb-1 border border-slate-200"
                               style={{ backgroundColor: solid.color }}
                             />
-                            <span className="text-[10px] font-medium text-slate-300 block truncate">
+                            <span className="text-[10px] font-semibold text-slate-800 block truncate">
                               {solid.name}
                             </span>
                             {isSelected && (
-                              <div className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-sky-500 flex items-center justify-center text-white">
+                              <div className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-sky-600 flex items-center justify-center text-white">
                                 <Check size={8} />
                               </div>
                             )}
@@ -1549,9 +1549,9 @@ export default {
                 </div>
 
                 {/* 4. Custom Wallpaper URL */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <ExternalLink size={14} className="text-sky-400" />
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                    <ExternalLink size={14} className="text-sky-600" />
                     <span>自定义背景图片直链 (URL)</span>
                   </h4>
                   <div className="flex items-center gap-2">
@@ -1560,12 +1560,12 @@ export default {
                       value={customWallpaperInput}
                       onChange={(e) => setCustomWallpaperInput(e.target.value)}
                       placeholder="https://example.com/wallpaper.jpg"
-                      className="flex-1 bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 outline-none focus:border-sky-400"
+                      className="flex-1 bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-sky-500"
                     />
                     <button
                       type="button"
                       onClick={() => handleApplyCustomUrl(customWallpaperInput)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all shadow"
+                      className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all shadow-sm shrink-0"
                     >
                       应用此直链
                     </button>
@@ -1573,9 +1573,9 @@ export default {
                 </div>
 
                 {/* 5. Background Visual Effects & Glass Modifiers */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-5">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <Sliders size={14} className="text-sky-400" />
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-5">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                    <Sliders size={14} className="text-sky-600" />
                     <span>壁纸视觉调校与滤镜特效</span>
                   </h4>
 
@@ -1583,8 +1583,8 @@ export default {
                     {/* Background Blur */}
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs">
-                        <span className="text-slate-300">背景模糊度 (Blur)</span>
-                        <span className="font-mono text-sky-400">{config.theme.wallpaperBlur || 0}px</span>
+                        <span className="text-slate-700 font-medium">背景模糊度 (Blur)</span>
+                        <span className="font-mono text-sky-600 font-bold">{config.theme.wallpaperBlur || 0}px</span>
                       </div>
                       <input
                         type="range"
@@ -1592,15 +1592,15 @@ export default {
                         max="35"
                         value={config.theme.wallpaperBlur || 0}
                         onChange={(e) => updateTheme({ wallpaperBlur: parseInt(e.target.value) })}
-                        className="w-full accent-sky-500 cursor-pointer"
+                        className="w-full accent-sky-600 cursor-pointer"
                       />
                     </div>
 
                     {/* Dark Mask Opacity */}
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs">
-                        <span className="text-slate-300">背景暗度遮罩 (Mask)</span>
-                        <span className="font-mono text-sky-400">
+                        <span className="text-slate-700 font-medium">背景暗度遮罩 (Mask)</span>
+                        <span className="font-mono text-sky-600 font-bold">
                           {Math.round((config.theme.wallpaperMaskOpacity ?? 0.3) * 100)}%
                         </span>
                       </div>
@@ -1612,13 +1612,13 @@ export default {
                         onChange={(e) =>
                           updateTheme({ wallpaperMaskOpacity: parseInt(e.target.value) / 100 })
                         }
-                        className="w-full accent-sky-500 cursor-pointer"
+                        className="w-full accent-sky-600 cursor-pointer"
                       />
                     </div>
 
                     {/* Wallpaper Fit */}
                     <div className="space-y-1.5">
-                      <span className="text-xs text-slate-300 block">填充适配模式</span>
+                      <span className="text-xs text-slate-700 font-medium block">填充适配模式</span>
                       <select
                         value={config.theme.wallpaperFit || 'cover'}
                         onChange={(e) =>
@@ -1626,12 +1626,12 @@ export default {
                             wallpaperFit: e.target.value as 'cover' | 'contain' | 'repeat' | 'auto',
                           })
                         }
-                        className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white focus:border-sky-400 outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-900 focus:border-sky-500 outline-none"
                       >
-                        <option value="cover" className="bg-slate-900">缩放铺满 (Cover)</option>
-                        <option value="contain" className="bg-slate-900">完整包含 (Contain)</option>
-                        <option value="repeat" className="bg-slate-900">平铺重复 (Repeat)</option>
-                        <option value="auto" className="bg-slate-900">原始比例 (Auto)</option>
+                        <option value="cover" className="bg-white text-slate-900">缩放铺满 (Cover)</option>
+                        <option value="contain" className="bg-white text-slate-900">完整包含 (Contain)</option>
+                        <option value="repeat" className="bg-white text-slate-900">平铺重复 (Repeat)</option>
+                        <option value="auto" className="bg-white text-slate-900">原始比例 (Auto)</option>
                       </select>
                     </div>
                   </div>
@@ -1645,30 +1645,30 @@ export default {
             {activeTab === 'sync' && (
               <div className="space-y-6">
                 {/* Account Authentication & Data Isolation Bar */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-slate-900/60 border border-blue-500/30 text-xs text-slate-300 space-y-3 shadow-lg">
+                <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-slate-700 space-y-3 shadow-sm">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
                         <User size={18} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-white font-bold text-sm">
-                            当前同步账号：<code className="px-2 py-0.5 rounded-lg bg-blue-500/20 text-sky-300 font-mono text-xs border border-blue-500/30">{currentAccount}</code>
+                          <span className="text-slate-900 font-bold text-sm">
+                            当前同步账号：<code className="px-2 py-0.5 rounded-lg bg-blue-100 text-blue-900 font-mono text-xs border border-blue-200">{currentAccount}</code>
                           </span>
                           {isCurrentSyncAuthed ? (
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-semibold flex items-center gap-1">
                               <Lock size={10} />
                               已验证凭证
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-semibold flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-semibold flex items-center gap-1">
                               <Unlock size={10} />
                               未验证凭证
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
+                        <p className="text-[11px] text-slate-600 mt-0.5">
                           各账号数据严格物理隔离，仅能读写当前已验证账号的数据
                         </p>
                       </div>
@@ -1698,7 +1698,7 @@ export default {
                               message: `已锁定账号 [${currentAccount}] 凭证，下次云同步需重新输入密码`,
                             });
                           }}
-                          className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-rose-300 border border-white/10 text-xs transition-all"
+                          className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 hover:text-rose-600 border border-slate-300 text-xs transition-all"
                           title="退出当前账号认证授权"
                         >
                           锁定
@@ -1707,8 +1707,8 @@ export default {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-[11px] text-slate-400">
-                    <ShieldCheck size={14} className="text-sky-400 shrink-0" />
+                  <div className="pt-2 border-t border-blue-200 flex items-center gap-2 text-[11px] text-slate-600">
+                    <ShieldCheck size={14} className="text-blue-600 shrink-0" />
                     <span>
                       多云同步权限与导出数据一致，严格隔离数据沙箱。不同账号的本地书签、远程配置、云存储记录完全互不干扰。
                     </span>
@@ -1717,11 +1717,10 @@ export default {
 
                 {/* Sync Provider Selector Bar */}
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">
                     选择云端实时同步方案
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-
                     {[
                       { id: 'gist', label: 'GitHub Gist', desc: '免建仓库·极简轻量', icon: <Github size={16} /> },
                       { id: 'github_repo', label: 'GitHub 独立仓库', desc: '独立Repo·版本历史', icon: <FileCode size={16} /> },
@@ -1738,16 +1737,16 @@ export default {
                           onClick={() => updateSync({ provider: prov.id as SyncProvider })}
                           className={`flex items-center gap-3 p-3 rounded-2xl border text-left transition-all ${
                             isSelected
-                              ? 'bg-blue-600/25 border-blue-500 text-white ring-1 ring-blue-500 shadow-md'
-                              : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                              ? 'bg-blue-50 border-blue-500 text-blue-900 ring-2 ring-blue-500/30 shadow-md'
+                              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                           }`}
                         >
-                          <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-blue-500 text-white' : 'bg-white/10 text-slate-400'}`}>
+                          <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
                             {prov.icon}
                           </div>
                           <div className="min-w-0">
                             <span className="text-xs font-bold block truncate">{prov.label}</span>
-                            <span className="text-[10px] text-slate-400 block truncate">{prov.desc}</span>
+                            <span className="text-[10px] text-slate-500 block truncate">{prov.desc}</span>
                           </div>
                         </button>
                       );
@@ -1757,37 +1756,37 @@ export default {
 
                 {/* Multi-Device & Multi-User Data Isolation Safety Card */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900/20 via-indigo-900/20 to-emerald-900/20 border border-blue-500/20 text-xs text-slate-300 space-y-2.5">
-                  <div className="flex items-center gap-2 text-sky-300 font-semibold text-sm">
-                    <ShieldCheck size={18} className="text-emerald-400 shrink-0" />
+                  <div className="flex items-center gap-2 text-sky-900 font-semibold text-sm">
+                    <ShieldCheck size={18} className="text-emerald-600 shrink-0" />
                     <span>多设备同步与多访客安全隔离保障（防丢失·防覆盖）</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] leading-relaxed pt-1">
-                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 space-y-1">
-                      <div className="font-semibold text-white flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                    <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1 shadow-2xs">
+                      <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                         访客沙箱隔离机制
                       </div>
-                      <p className="text-slate-400">
+                      <p className="text-slate-600">
                         不同访客用不同设备访问时，数据保存在各自浏览器独立沙盒（LocalStorage）中，绝不会读取或覆盖其他人员的个人数据。
                       </p>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 space-y-1">
-                      <div className="font-semibold text-white flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1 shadow-2xs">
+                      <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         双向增量并集合并
                       </div>
-                      <p className="text-slate-400">
+                      <p className="text-slate-600">
                         推送和拉取均启用前置增量合并（Smart Union），多端新增的书签均会自动基于 URL 智能排重并安全汇合，绝不互相覆盖。
                       </p>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 space-y-1">
-                      <div className="font-semibold text-white flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                    <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1 shadow-2xs">
+                      <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                         初始新设备安全采纳
                       </div>
-                      <p className="text-slate-400">
+                      <p className="text-slate-600">
                         在全新设备首次配置并拉取时，会自动采纳云端纯净配置，避免默认初始推荐示例反向污染您已整理好的书签架构。
                       </p>
                     </div>
@@ -1796,17 +1795,17 @@ export default {
 
                 {/* GitHub Gist Config Form */}
                 {config.sync.provider === 'gist' && (
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                       <div className="flex items-center gap-2">
-                        <Github size={18} className="text-purple-400" />
-                        <h4 className="text-sm font-bold text-white">GitHub Gist 云端配置</h4>
+                        <Github size={18} className="text-purple-600" />
+                        <h4 className="text-sm font-bold text-slate-900">GitHub Gist 云端配置</h4>
                       </div>
                       <a
                         href="https://github.com/settings/tokens/new?scopes=gist&description=LyLme_Spage_Sync"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-sky-400 hover:underline flex items-center gap-1"
+                        className="text-xs text-sky-600 hover:underline flex items-center gap-1 font-medium"
                       >
                         获取 Token <ExternalLink size={12} />
                       </a>
@@ -1814,7 +1813,7 @@ export default {
 
                     <div className="space-y-3">
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           GitHub Personal Access Token (PAT)
                         </label>
                         <input
@@ -1826,18 +1825,18 @@ export default {
                               gist: { ...config.sync.gist, token: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <label className="text-xs font-medium text-slate-300">Gist ID (留空可点击右侧自动新建)</label>
+                          <label className="text-xs font-semibold text-slate-700">Gist ID (留空可点击右侧自动新建)</label>
                           <button
                             type="button"
                             onClick={handleCreateGist}
                             disabled={creatingGist || !config.sync.gist.token}
-                            className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 disabled:opacity-40"
+                            className="text-[11px] text-purple-600 hover:text-purple-700 font-semibold flex items-center gap-1 disabled:opacity-40"
                           >
                             <Sparkles size={12} />
                             {creatingGist ? '正在自动创建...' : '自动新建并绑定 Gist'}
@@ -1852,7 +1851,7 @@ export default {
                               gist: { ...config.sync.gist, gistId: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
                     </div>
@@ -1861,30 +1860,30 @@ export default {
 
                 {/* GitHub Independent Repository Sync Form */}
                 {config.sync.provider === 'github_repo' && (
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                       <div className="flex items-center gap-2">
-                        <FileCode size={18} className="text-emerald-400" />
-                        <h4 className="text-sm font-bold text-white">GitHub 独立代码仓库同步</h4>
+                        <FileCode size={18} className="text-emerald-600" />
+                        <h4 className="text-sm font-bold text-slate-900">GitHub 独立代码仓库同步</h4>
                       </div>
                       <a
                         href="https://github.com/settings/tokens/new?scopes=repo&description=LyLme_Spage_Repo_Sync"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+                        className="text-xs text-emerald-600 hover:underline flex items-center gap-1 font-medium"
                       >
                         获取含 repo 权限 Token <ExternalLink size={12} />
                       </a>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-slate-300 leading-relaxed">
+                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 leading-relaxed">
                       💡 支持私有/公开 Git 仓库同步。每次推送到云端都会产生清晰的 Git Commit 提交记录，方便回溯历史版本。
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
-                          GitHub Personal Access Token (PAT) <span className="text-rose-400">*</span>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          GitHub Personal Access Token (PAT) <span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="password"
@@ -1895,13 +1894,13 @@ export default {
                               githubRepo: { ...config.sync.githubRepo, token: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none font-mono"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none font-mono"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
-                          仓库所有者 / 用户名 (Owner) <span className="text-rose-400">*</span>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          仓库所有者 / 用户名 (Owner) <span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -1912,13 +1911,13 @@ export default {
                               githubRepo: { ...config.sync.githubRepo, owner: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
-                          仓库名称 (Repository) <span className="text-rose-400">*</span>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          仓库名称 (Repository) <span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -1929,12 +1928,12 @@ export default {
                               githubRepo: { ...config.sync.githubRepo, repo: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           分支名称 (Branch)
                         </label>
                         <input
@@ -1946,12 +1945,12 @@ export default {
                               githubRepo: { ...config.sync.githubRepo, branch: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none font-mono"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none font-mono"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           保存文件路径 (Path)
                         </label>
                         <input
@@ -1963,7 +1962,7 @@ export default {
                               githubRepo: { ...config.sync.githubRepo, path: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none font-mono"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none font-mono"
                         />
                       </div>
                     </div>
@@ -1972,33 +1971,33 @@ export default {
 
                 {/* 坚果云 / 自建 WebDAV Sync Form */}
                 {config.sync.provider === 'webdav' && (
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                       <div className="flex items-center gap-2">
-                        <Cloud size={18} className="text-sky-400" />
-                        <h4 className="text-sm font-bold text-white">坚果云 / 自建 WebDAV 协议同步</h4>
+                        <Cloud size={18} className="text-sky-600" />
+                        <h4 className="text-sm font-bold text-slate-900">坚果云 / 自建 WebDAV 协议同步</h4>
                       </div>
                       <a
                         href="https://help.jianguoyun.com/?p=2064"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-sky-400 hover:underline flex items-center gap-1"
+                        className="text-xs text-sky-600 hover:underline flex items-center gap-1 font-medium"
                       >
                         坚果云 WebDAV 开启教程 <ExternalLink size={12} />
                       </a>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-slate-300 space-y-1.5 leading-relaxed">
-                      <p className="font-semibold text-sky-300">📦 坚果云设置提示：</p>
-                      <p>1. 坚果云服务器地址：<code className="text-sky-200 bg-black/40 px-1 py-0.5 rounded font-mono">https://dav.jianguoyun.com/dav/</code></p>
+                    <div className="p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-xs text-slate-700 space-y-1.5 leading-relaxed">
+                      <p className="font-semibold text-sky-900">📦 坚果云设置提示：</p>
+                      <p>1. 坚果云服务器地址：<code className="text-sky-900 bg-sky-100/80 px-1 py-0.5 rounded font-mono">https://dav.jianguoyun.com/dav/</code></p>
                       <p>2. 账号：您的坚果云注册邮箱</p>
                       <p>3. 密码：请在坚果云网页端【账户信息】&rarr;【安全设置】&rarr;【第三方应用管理】中生成<strong>应用授权密码</strong>（切勿使用网页登录原密码）。</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
-                          WebDAV 服务器地址 (URL) <span className="text-rose-400">*</span>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          WebDAV 服务器地址 (URL) <span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -2009,13 +2008,13 @@ export default {
                               webdav: { ...config.sync.webdav, url: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none font-mono"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none font-mono"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
-                          WebDAV 账号 / 邮箱 (Username) <span className="text-rose-400">*</span>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          WebDAV 账号 / 邮箱 (Username) <span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -2026,13 +2025,13 @@ export default {
                               webdav: { ...config.sync.webdav, username: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
-                          应用密码 / 授权凭证 (Password) <span className="text-rose-400">*</span>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          应用密码 / 授权凭证 (Password) <span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="password"
@@ -2043,12 +2042,12 @@ export default {
                               webdav: { ...config.sync.webdav, password: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none font-mono"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none font-mono"
                         />
                       </div>
 
                       <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           存储文件名 (Filename)
                         </label>
                         <input
@@ -2060,7 +2059,7 @@ export default {
                               webdav: { ...config.sync.webdav, filename: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none font-mono"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none font-mono"
                         />
                       </div>
                     </div>
@@ -2069,43 +2068,43 @@ export default {
 
                 {/* Cloudflare KV Config Form */}
                 {config.sync.provider === 'cf_kv' && (
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                       <div className="flex items-center gap-2">
-                        <Database size={18} className="text-amber-400" />
-                        <h4 className="text-sm font-bold text-white">Cloudflare Workers KV 配置</h4>
+                        <Database size={18} className="text-amber-600" />
+                        <h4 className="text-sm font-bold text-slate-900">Cloudflare Workers KV 配置</h4>
                       </div>
                       <a
                         href="https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-sky-400 hover:underline flex items-center gap-1"
+                        className="text-xs text-sky-600 hover:underline flex items-center gap-1 font-medium"
                       >
                         前往 Cloudflare 控制台 <ExternalLink size={12} />
                       </a>
                     </div>
 
                     {/* Edge Zero-CORS Notice */}
-                    <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 to-sky-500/10 border border-amber-500/30 text-xs text-slate-300 space-y-2">
-                      <div className="flex items-center gap-2 font-bold text-amber-300">
+                    <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-sky-50 border border-amber-200 text-xs text-slate-700 space-y-2">
+                      <div className="flex items-center gap-2 font-bold text-amber-900">
                         <Sparkles size={15} />
                         <span>推荐最佳实践：Cloudflare Pages 边缘后端模式 (免填凭证 & 100% 绕过 CORS)</span>
                       </div>
-                      <p className="text-[11px] text-slate-300 leading-relaxed">
-                        由于 Cloudflare REST API 会被浏览器严格拦截跨域 (CORS)，本项目内置了 Cloudflare Pages Serverless 接口 (<code className="text-amber-300 bg-black/40 px-1 py-0.5 rounded font-mono">/api/sync</code>)。
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        由于 Cloudflare REST API 会被浏览器严格拦截跨域 (CORS)，本项目内置了 Cloudflare Pages Serverless 接口 (<code className="text-amber-900 bg-amber-100 px-1 py-0.5 rounded font-mono">/api/sync</code>)。
                       </p>
-                      <div className="bg-black/30 rounded-lg p-2.5 space-y-1 text-[11px] font-mono text-slate-300 border border-white/5">
-                        <p className="text-emerald-400 font-semibold">⚡ 2 步极速免密配置：</p>
-                        <p>1. 在 Cloudflare 控制台创建 KV 命名空间（如 <code className="text-amber-300">my-nav-kv</code>）</p>
-                        <p>2. 在 Cloudflare Pages 项目的 <strong className="text-white">Settings &rarr; Functions &rarr; KV namespace bindings</strong> 中添加绑定：</p>
-                        <p className="pl-4 text-sky-300">变量名 (Variable name): <strong className="text-amber-300 bg-black/60 px-1.5 py-0.5 rounded">ONENAV_KV</strong></p>
-                        <p className="text-emerald-300">✓ 绑定后前端无需填写 Account ID 与 API Token，系统自动通过边缘服务端无感读写！</p>
+                      <div className="bg-white rounded-lg p-2.5 space-y-1 text-[11px] font-mono text-slate-700 border border-slate-200">
+                        <p className="text-emerald-700 font-semibold">⚡ 2 步极速免密配置：</p>
+                        <p>1. 在 Cloudflare 控制台创建 KV 命名空间（如 <code className="text-amber-800">my-nav-kv</code>）</p>
+                        <p>2. 在 Cloudflare Pages 项目的 <strong className="text-slate-900">Settings &rarr; Functions &rarr; KV namespace bindings</strong> 中添加绑定：</p>
+                        <p className="pl-4 text-sky-700">变量名 (Variable name): <strong className="text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">ONENAV_KV</strong></p>
+                        <p className="text-emerald-700 font-medium">✓ 绑定后前端无需填写 Account ID 与 API Token，系统自动通过边缘服务端无感读写！</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           Cloudflare Account ID <span className="text-slate-500 text-[10px]">(免密绑定模式下可留空)</span>
                         </label>
                         <input
@@ -2117,12 +2116,12 @@ export default {
                               cfKv: { ...config.sync.cfKv, accountId: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           KV Namespace ID <span className="text-slate-500 text-[10px]">(免密绑定模式下可留空)</span>
                         </label>
                         <input
@@ -2134,12 +2133,12 @@ export default {
                               cfKv: { ...config.sync.cfKv, namespaceId: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           Cloudflare API Token <span className="text-slate-500 text-[10px]">(免密绑定模式下可留空)</span>
                         </label>
                         <input
@@ -2151,7 +2150,7 @@ export default {
                               cfKv: { ...config.sync.cfKv, apiToken: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
                     </div>
@@ -2160,40 +2159,40 @@ export default {
 
                 {/* Cloudflare D1 Config Form */}
                 {config.sync.provider === 'cf_d1' && (
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                       <div className="flex items-center gap-2">
-                        <Server size={18} className="text-emerald-400" />
-                        <h4 className="text-sm font-bold text-white">Cloudflare D1 SQL 数据库配置</h4>
+                        <Server size={18} className="text-emerald-600" />
+                        <h4 className="text-sm font-bold text-slate-900">Cloudflare D1 SQL 数据库配置</h4>
                       </div>
                       <a
                         href="https://dash.cloudflare.com/?to=/:account/workers/d1"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-sky-400 hover:underline flex items-center gap-1"
+                        className="text-xs text-sky-600 hover:underline flex items-center gap-1 font-medium"
                       >
                         前往 Cloudflare D1 <ExternalLink size={12} />
                       </a>
                     </div>
 
                     {/* Edge Zero-CORS Notice for D1 */}
-                    <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-500/10 to-sky-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-2">
-                      <div className="flex items-center gap-2 font-bold text-emerald-300">
+                    <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-50 to-sky-50 border border-emerald-200 text-xs text-slate-700 space-y-2">
+                      <div className="flex items-center gap-2 font-bold text-emerald-900">
                         <Sparkles size={15} />
                         <span>推荐最佳实践：Cloudflare Pages D1 边缘直连 (零跨域 & 免客户端凭证)</span>
                       </div>
-                      <p className="text-[11px] text-slate-300 leading-relaxed">
-                        将本项目部署至 Cloudflare Pages，在 <strong className="text-white">Settings &rarr; Functions &rarr; D1 database bindings</strong> 中添加绑定：
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        将本项目部署至 Cloudflare Pages，在 <strong className="text-slate-900">Settings &rarr; Functions &rarr; D1 database bindings</strong> 中添加绑定：
                       </p>
-                      <div className="bg-black/30 rounded-lg p-2.5 space-y-1 text-[11px] font-mono text-slate-300 border border-white/5">
-                        <p className="text-sky-300">变量名 (Variable name): <strong className="text-emerald-300 bg-black/60 px-1.5 py-0.5 rounded">ONENAV_D1</strong> (或 <strong className="text-emerald-300">DB</strong>)</p>
-                        <p className="text-emerald-300">✓ 绑定后无需填写 API Token，系统自动通过服务端 /api/sync 端点执行 SQL 读写。</p>
+                      <div className="bg-white rounded-lg p-2.5 space-y-1 text-[11px] font-mono text-slate-700 border border-slate-200">
+                        <p className="text-sky-700">变量名 (Variable name): <strong className="text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">ONENAV_D1</strong> (或 <strong className="text-emerald-800">DB</strong>)</p>
+                        <p className="text-emerald-700 font-medium">✓ 绑定后无需填写 API Token，系统自动通过服务端 /api/sync 端点执行 SQL 读写。</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           Cloudflare Account ID <span className="text-slate-500 text-[10px]">(免密绑定模式下可留空)</span>
                         </label>
                         <input
@@ -2205,12 +2204,12 @@ export default {
                               cfD1: { ...config.sync.cfD1, accountId: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           D1 Database ID <span className="text-slate-500 text-[10px]">(免密绑定模式下可留空)</span>
                         </label>
                         <input
@@ -2222,12 +2221,12 @@ export default {
                               cfD1: { ...config.sync.cfD1, databaseId: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-slate-300 block mb-1">
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
                           Cloudflare API Token <span className="text-slate-500 text-[10px]">(免密绑定模式下可留空)</span>
                         </label>
                         <input
@@ -2239,12 +2238,12 @@ export default {
                               cfD1: { ...config.sync.cfD1, apiToken: e.target.value.trim() },
                             })
                           }
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                         />
                       </div>
 
                       <div className="md:col-span-2 flex items-center justify-between pt-1">
-                        <span className="text-xs text-slate-400">首次使用需在 D1 中自动建表:</span>
+                        <span className="text-xs text-slate-600 font-medium">首次使用需在 D1 中自动建表:</span>
                         <button
                           type="button"
                           onClick={handleInitD1}
@@ -2261,15 +2260,15 @@ export default {
 
                 {/* Global Sync Controls & Test */}
                 {config.sync.provider !== 'none' && (
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       自动同步策略与连接测试
                     </h4>
 
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <span className="font-semibold text-white block">本地修改后自动推送同步</span>
-                        <span className="text-slate-400">每次添加、编辑或删除书签时，自动防抖同步至云端</span>
+                        <span className="font-semibold text-slate-900 block">本地修改后自动推送同步</span>
+                        <span className="text-slate-500">每次添加、编辑或删除书签时，自动防抖同步至云端</span>
                       </div>
                       <input
                         type="checkbox"
@@ -2279,7 +2278,7 @@ export default {
                       />
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/10">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-200">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -2295,20 +2294,20 @@ export default {
                           type="button"
                           onClick={handlePullLatest}
                           disabled={pullingLatest || syncStatus.status === 'syncing'}
-                          className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 hover:text-white border border-emerald-500/30 hover:border-emerald-500/50 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="从多端云端存储拉取最新配置并智能安全合并，确保跨设备不丢失任何数据"
                         >
                           {pullingLatest || syncStatus.status === 'syncing' ? (
-                            <RefreshCw size={13} className="animate-spin text-emerald-400" />
+                            <RefreshCw size={13} className="animate-spin text-emerald-600" />
                           ) : (
-                            <Download size={13} className="text-emerald-400" />
+                            <Download size={13} className="text-emerald-600" />
                           )}
                           <span>{pullingLatest || syncStatus.status === 'syncing' ? '正在拉取最新...' : '从云端拉取最新'}</span>
                         </button>
                       </div>
 
                       {/* Sync Status Badge */}
-                      <div className="text-xs text-slate-400">
+                      <div className="text-xs text-slate-500 font-medium">
                         最后同步: {syncStatus.lastSyncedAt ? new Date(syncStatus.lastSyncedAt).toLocaleTimeString() : '尚未同步'}
                       </div>
                     </div>
@@ -2318,11 +2317,11 @@ export default {
                       <div
                         className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
                           testResult.success
-                            ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
-                            : 'bg-rose-500/15 border border-rose-500/30 text-rose-300'
+                            ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                            : 'bg-rose-50 border border-rose-200 text-rose-800'
                         }`}
                       >
-                        {testResult.success ? <Check size={14} /> : <AlertCircle size={14} />}
+                        {testResult.success ? <Check size={14} className="text-emerald-600" /> : <AlertCircle size={14} className="text-rose-600" />}
                         <span>{testResult.message}</span>
                       </div>
                     )}
@@ -2333,18 +2332,18 @@ export default {
 
             {/* =========================================================================
                 TAB 3: SEARCH ENGINES
-               ========================================================================= */}
+            ========================================================================= */}
             {activeTab === 'search' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Search size={16} className="text-sky-400" />
+                  <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Search size={16} className="text-sky-600" />
                     搜索引擎列表 (已启用 {config.searchEngines.length} 个)
                   </h4>
                   <button
                     type="button"
                     onClick={() => setShowAddEngine(!showAddEngine)}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
                   >
                     <Plus size={14} /> 添加搜索引擎
                   </button>
@@ -2358,7 +2357,7 @@ export default {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       onSubmit={handleAddSearchEngine}
-                      className="bg-white/10 border border-white/20 rounded-2xl p-4 space-y-3"
+                      className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3"
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <input
@@ -2366,7 +2365,7 @@ export default {
                           placeholder="引擎名称 (如: 小红书)"
                           value={newEngine.name}
                           onChange={(e) => setNewEngine({ ...newEngine, name: e.target.value })}
-                          className="bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-xs text-white"
+                          className="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none"
                           required
                         />
                         <input
@@ -2374,7 +2373,7 @@ export default {
                           placeholder="搜索 URL (如: https://.../search?q=)"
                           value={newEngine.url}
                           onChange={(e) => setNewEngine({ ...newEngine, url: e.target.value })}
-                          className="bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-xs text-white sm:col-span-2"
+                          className="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none sm:col-span-2"
                           required
                         />
                       </div>
@@ -2382,13 +2381,13 @@ export default {
                         <button
                           type="button"
                           onClick={() => setShowAddEngine(false)}
-                          className="px-3 py-1.5 text-xs text-slate-400 hover:text-white"
+                          className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900"
                         >
                           取消
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold"
+                          className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-sm"
                         >
                           确认添加
                         </button>
@@ -2402,21 +2401,21 @@ export default {
                   {config.searchEngines.map((engine) => (
                     <div
                       key={engine.id}
-                      className="flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all"
+                      className="flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 shadow-2xs transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center font-bold text-xs text-white">
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center font-bold text-xs text-blue-700">
                           {engine.name[0]}
                         </div>
                         <div>
-                          <span className="text-sm font-semibold text-white">{engine.name}</span>
-                          <span className="text-xs text-slate-400 block truncate max-w-md">{engine.url}</span>
+                          <span className="text-sm font-semibold text-slate-900">{engine.name}</span>
+                          <span className="text-xs text-slate-500 block truncate max-w-md">{engine.url}</span>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleDeleteSearchEngine(engine.id)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/10 transition-colors"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                         title="删除此搜索引擎"
                       >
                         <Trash2 size={14} />
@@ -2429,11 +2428,11 @@ export default {
 
             {/* =========================================================================
                 TAB 4: SERVERLESS DEPLOYMENT GUIDE
-               ========================================================================= */}
+            ========================================================================= */}
             {activeTab === 'serverless' && (
               <div className="space-y-6">
-                <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-200 leading-relaxed">
-                  <p className="font-bold text-sm text-blue-100 mb-1">
+                <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-950 leading-relaxed">
+                  <p className="font-bold text-sm text-blue-900 mb-1">
                     🎉 零服务器·真正的现代 Serverless 架构
                   </p>
                   本项目基于纯静态前端 + 边缘云原生设计，无需购买任何云服务器或虚拟主机，直接构建出的静态文件可免费托管在以下无服务器平台，并支持通过 GitHub Gist 或 Cloudflare 实时多端持久化同步：
@@ -2441,11 +2440,11 @@ export default {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* GitHub Pages */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
-                    <h5 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Github size={16} /> 部署到 GitHub Pages
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                    <h5 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Github size={16} className="text-slate-800" /> 部署到 GitHub Pages
                     </h5>
-                    <ol className="text-xs text-slate-300 space-y-1 list-decimal list-inside leading-relaxed">
+                    <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside leading-relaxed">
                       <li>将本项目推送到您的 GitHub 个人仓库；</li>
                       <li>在仓库设置 Settings -&gt; Pages 中，将 Source 选为 <code>GitHub Actions</code>；</li>
                       <li>项目内置标准 Vite 构建流，提交即自动编译上线！</li>
@@ -2453,11 +2452,11 @@ export default {
                   </div>
 
                   {/* Cloudflare Pages */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
-                    <h5 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Server size={16} /> 部署到 Cloudflare Pages
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                    <h5 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Server size={16} className="text-amber-600" /> 部署到 Cloudflare Pages
                     </h5>
-                    <ol className="text-xs text-slate-300 space-y-1 list-decimal list-inside leading-relaxed">
+                    <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside leading-relaxed">
                       <li>在 Cloudflare 控制台新建 Pages 项目，连接 GitHub 仓库；</li>
                       <li>构建命令填写: <code>npm run build</code>，输出目录填写: <code>dist</code>；</li>
                       <li>在设置中绑定 KV 为 <code>SPAGE_KV</code> 或 D1 为 <code>SPAGE_D1</code> 即可！</li>
@@ -2465,30 +2464,30 @@ export default {
                   </div>
 
                   {/* Vercel */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
-                    <h5 className="text-sm font-bold text-white flex items-center gap-2">
-                      <ExternalLink size={16} /> 部署到 Vercel
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                    <h5 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <ExternalLink size={16} className="text-slate-800" /> 部署到 Vercel
                     </h5>
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       在 Vercel 仪表盘一键 Import 仓库，框架预设选择 Vite，零配置直接点击 Deploy，1分钟内即可在全球边缘 CDN 节点生效。
                     </p>
                   </div>
 
                   {/* Netlify */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
-                    <h5 className="text-sm font-bold text-white flex items-center gap-2">
-                      <ExternalLink size={16} /> 部署到 Netlify
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                    <h5 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <ExternalLink size={16} className="text-teal-600" /> 部署到 Netlify
                     </h5>
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       新建 Netlify 站点，Publish directory 填写 <code>dist</code>，Build command 填写 <code>npm run build</code> 即可。
                     </p>
                   </div>
                 </div>
 
                 {/* Cloudflare Worker Edge Proxy Script Code */}
-                <div className="bg-black/50 border border-white/10 rounded-2xl p-4 space-y-2">
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2 text-slate-100">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300">
+                    <span className="text-xs font-bold text-slate-200">
                       备用: Cloudflare Worker 15行极简边缘跨域代码 (可选)
                     </span>
                     <button
@@ -2498,13 +2497,13 @@ export default {
                         setCopiedCode(true);
                         setTimeout(() => setCopiedCode(false), 2000);
                       }}
-                      className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1"
+                      className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1 font-semibold"
                     >
                       {copiedCode ? <Check size={12} /> : <Copy size={12} />}
                       {copiedCode ? '已复制' : '复制 Worker 代码'}
                     </button>
                   </div>
-                  <pre className="text-[11px] font-mono text-slate-400 overflow-x-auto p-3 bg-black/60 rounded-xl max-h-44">
+                  <pre className="text-[11px] font-mono text-slate-300 overflow-x-auto p-3 bg-slate-950 rounded-xl max-h-44">
                     {workerProxyCode}
                   </pre>
                 </div>
@@ -2513,52 +2512,52 @@ export default {
 
             {/* =========================================================================
                 TAB 5: BACKUP & RESTORE / SITE INFO & ICP
-               ========================================================================= */}
+            ========================================================================= */}
             {activeTab === 'backup' && (
               <div className="space-y-6">
                 {/* Site & Compliance Filing Section */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <div className="flex items-center gap-2 text-sky-400">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <div className="flex items-center gap-2 text-sky-600">
                       <Globe size={18} />
-                      <h4 className="text-sm font-bold text-white">网站信息与站长备案</h4>
+                      <h4 className="text-sm font-bold text-slate-900">网站信息与站长备案</h4>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
+                    <span className="text-[11px] font-mono text-slate-600 bg-white px-2.5 py-0.5 rounded-full border border-slate-200">
                       版本号: v{config.version || '2.2.0'}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-slate-300 block mb-1">站点主标题</label>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">站点主标题</label>
                       <input
                         type="text"
                         value={config.title}
                         onChange={(e) => onChange({ ...config, title: e.target.value })}
-                        className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-blue-400 outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-slate-300 block mb-1">副标题</label>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">副标题</label>
                       <input
                         type="text"
                         value={config.subtitle}
                         onChange={(e) => onChange({ ...config, subtitle: e.target.value })}
-                        className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-blue-400 outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 outline-none"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
                       <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs font-medium text-slate-300">
+                        <label className="text-xs font-semibold text-slate-700">
                           ICP 备案号 (个人站长合规展示，将在极简页脚自动呈现)
                         </label>
                         <a
                           href="https://beian.miit.gov.cn/"
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] text-sky-400 hover:underline flex items-center gap-1"
+                          className="text-[11px] text-sky-600 hover:underline flex items-center gap-1 font-medium"
                         >
                           工信部 ICP 备案查询 <ExternalLink size={11} />
                         </a>
@@ -2568,9 +2567,9 @@ export default {
                         placeholder="例如: 京ICP备12345678号-1 或 粤B2-20240001 (留空则页脚不展示)"
                         value={config.icp || ''}
                         onChange={(e) => onChange({ ...config, icp: e.target.value })}
-                        className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:border-blue-400 outline-none font-mono"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 outline-none font-mono"
                       />
-                      <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                      <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
                         根据工信部《互联网信息服务管理办法》，个人站长可在上方输入合规 ICP 备案号，系统将在极简页脚中自动展示并附带工信部官方查询链接。
                       </p>
                     </div>
@@ -2582,22 +2581,22 @@ export default {
                   <div
                     className={`p-3.5 rounded-xl border text-xs flex items-center justify-between ${
                       dataActionNotice.type === 'success'
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                        : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                        : 'bg-rose-50 border-rose-200 text-rose-800'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       {dataActionNotice.type === 'success' ? (
-                        <CheckCircle2 size={16} />
+                        <CheckCircle2 size={16} className="text-emerald-600" />
                       ) : (
-                        <AlertCircle size={16} />
+                        <AlertCircle size={16} className="text-rose-600" />
                       )}
-                      <span>{dataActionNotice.message}</span>
+                      <span className="font-medium">{dataActionNotice.message}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setDataActionNotice(null)}
-                      className="text-white/60 hover:text-white px-2 py-0.5 text-[11px]"
+                      className="text-slate-500 hover:text-slate-800 px-2 py-0.5 text-[11px]"
                     >
                       ✕
                     </button>
@@ -2605,25 +2604,25 @@ export default {
                 )}
 
                 {/* Import Strategy Option */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
-                  <div className="flex items-center justify-between">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-                        <Database size={14} className="text-sky-400" />
+                      <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                        <Database size={14} className="text-sky-600" />
                         导入与还原处理策略 (Import Strategy)
                       </h4>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                      <p className="text-[11px] text-slate-500 mt-0.5">
                         选择导入 JSON 备份或浏览器 HTML 书签文件时如何与现有数据合并。
                       </p>
                     </div>
-                    <div className="flex items-center bg-black/40 p-1 rounded-xl border border-white/10 shrink-0">
+                    <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shrink-0">
                       <button
                         type="button"
                         onClick={() => setImportStrategy('merge')}
                         className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                           importStrategy === 'merge'
                             ? 'bg-blue-600 text-white shadow-sm'
-                            : 'text-slate-400 hover:text-white'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         增量合并去重
@@ -2634,14 +2633,14 @@ export default {
                         className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                           importStrategy === 'overwrite'
                             ? 'bg-rose-600 text-white shadow-sm'
-                            : 'text-slate-400 hover:text-white'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         完全覆盖替换
                       </button>
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg">
+                  <p className="text-[11px] text-slate-600 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
                     {importStrategy === 'merge'
                       ? '💡 增量合并模式：保留现有分组，仅将备份文件中的新书签追加到对应分组，遇到重复网址自动跳过，保障已有数据安全。'
                       : '⚠️ 完全覆盖模式：将用文件中的书签与分组完全取代当前所有分类与网址。'}
@@ -2651,45 +2650,45 @@ export default {
                 {/* Export Cards */}
                 <div>
                   <div className="flex items-center justify-between mb-2.5 px-1">
-                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                       数据一键导出与备份 (Export Center)
                     </h4>
-                    <span className="text-[11px] text-amber-400 flex items-center gap-1 font-medium">
+                    <span className="text-[11px] text-amber-700 flex items-center gap-1 font-semibold">
                       🔒 需管理员权限 (admin)
                     </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* JSON Export */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-sky-400">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-sky-600">
                         <FileJson size={18} />
-                        <h5 className="text-xs font-bold text-white">一键备份所有配置 (JSON)</h5>
+                        <h5 className="text-xs font-bold text-slate-900">一键备份所有配置 (JSON)</h5>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
                         包含全部分类、多级分组、书签网址、搜索引擎以及主题外观的完整快照，适合全量备份与跨机迁移。
                       </p>
                       <button
                         type="button"
                         onClick={() => handleTriggerExport('json')}
-                        className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-md"
+                        className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                       >
                         <Download size={14} /> 导出 JSON 完整备份
                       </button>
                     </div>
 
                     {/* HTML Bookmark Export */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-indigo-400">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-indigo-600">
                         <Bookmark size={18} />
-                        <h5 className="text-xs font-bold text-white">导出浏览器书签 (HTML)</h5>
+                        <h5 className="text-xs font-bold text-slate-900">导出浏览器书签 (HTML)</h5>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
                         标准 Netscape Bookmark HTML 格式，导出后可直接导入 Chrome、Edge、Firefox 或 Safari 浏览器收藏夹。
                       </p>
                       <button
                         type="button"
                         onClick={() => handleTriggerExport('html')}
-                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-md"
+                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                       >
                         <Download size={14} /> 导出 HTML 书签文件
                       </button>
@@ -2697,15 +2696,15 @@ export default {
                   </div>
 
                   {/* Security & Env Notice */}
-                  <div className="mt-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-slate-300 space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-amber-300 font-semibold">
+                  <div className="mt-3 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-slate-800 space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-amber-900 font-semibold">
                       <span>🛡️ 数据导出安全权限说明</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                    <p className="text-[11px] text-slate-600 leading-relaxed">
                       为防止未授权访客下载您的全量书签与配置数据，导出全站数据需验证管理员安全凭证。
                     </p>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      <strong>如何自定义凭据：</strong>您可在环境变量文件（如 <code className="text-sky-300 bg-black/40 px-1 py-0.5 rounded font-mono">.env</code>）中配置 <code className="text-sky-300 bg-black/40 px-1 py-0.5 rounded font-mono">VITE_EXPORT_ADMIN_USER</code> 与 <code className="text-sky-300 bg-black/40 px-1 py-0.5 rounded font-mono">VITE_EXPORT_ADMIN_PASS</code>，账号密码不会在前端代码中明文显示。
+                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                      <strong>如何自定义凭据：</strong>您可在环境变量文件（如 <code className="text-sky-700 bg-white px-1 py-0.5 rounded font-mono border border-slate-200">.env</code>）中配置 <code className="text-sky-700 bg-white px-1 py-0.5 rounded font-mono border border-slate-200">VITE_EXPORT_ADMIN_USER</code> 与 <code className="text-sky-700 bg-white px-1 py-0.5 rounded font-mono border border-slate-200">VITE_EXPORT_ADMIN_PASS</code>，账号密码不会在前端代码中明文显示。
                     </p>
                   </div>
                 </div>
@@ -2713,13 +2712,13 @@ export default {
                 {/* Import Cards */}
                 <div>
                   <div className="flex items-center justify-between mb-2.5 px-1">
-                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                       数据一键还原与导入 (Import & Restore)
                     </h4>
                     <span className={`text-[11px] px-2 py-0.5 rounded-md font-semibold border ${
                       importStrategy === 'merge'
-                        ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-                        : 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                        : 'bg-rose-50 text-rose-700 border-rose-200'
                     }`}>
                       当前策略：{importStrategy === 'merge' ? '增量合并去重' : '完全覆盖替换'}
                     </span>
@@ -2732,107 +2731,107 @@ export default {
                       onDrop={handleFileDrop}
                       className={`relative p-5 rounded-2xl border-2 border-dashed transition-all text-center flex flex-col items-center justify-center gap-2 cursor-pointer ${
                         isDraggingOver
-                          ? 'border-blue-400 bg-blue-500/20 text-blue-200 scale-[1.01]'
-                          : 'border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/30 text-slate-300'
+                          ? 'border-blue-500 bg-blue-50 text-blue-900 scale-[1.01]'
+                          : 'border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 text-slate-700 shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <div className="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300">
+                        <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
                           <Upload size={18} />
                         </div>
-                        <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300">
+                        <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-700">
                           <Bookmark size={18} />
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs font-bold text-white">
+                        <p className="text-xs font-bold text-slate-900">
                           {isDraggingOver
                             ? '松开鼠标即可按当前策略解析导入文件'
                             : '拖拽 HTML 书签文件 (.html / .htm) 或 JSON 配置文件 (.json) 到此处'}
                         </p>
-                        <p className="text-[11px] text-slate-400">
-                          系统将根据当前选择的 <strong className="text-blue-300">{importStrategy === 'merge' ? '【增量合并去重】' : '【完全覆盖替换】'}</strong> 策略自动识别并处理
+                        <p className="text-[11px] text-slate-500">
+                          系统将根据当前选择的 <strong className="text-blue-700">{importStrategy === 'merge' ? '【增量合并去重】' : '【完全覆盖替换】'}</strong> 策略自动识别并处理
                         </p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* JSON Import */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-emerald-400">
-                          <Upload size={18} />
-                          <h5 className="text-xs font-bold text-white">从 JSON 文件还原数据</h5>
+                      {/* JSON Import */}
+                      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-emerald-600">
+                            <Upload size={18} />
+                            <h5 className="text-xs font-bold text-slate-900">从 JSON 文件还原数据</h5>
+                          </div>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${
+                            importStrategy === 'merge' ? 'bg-blue-100 text-blue-800' : 'bg-rose-100 text-rose-800'
+                          }`}>
+                            {importStrategy === 'merge' ? '增量导入' : '覆盖导入'}
+                          </span>
                         </div>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                          importStrategy === 'merge' ? 'bg-blue-500/20 text-blue-300' : 'bg-rose-500/20 text-rose-300'
-                        }`}>
-                          {importStrategy === 'merge' ? '增量导入' : '覆盖导入'}
-                        </span>
+                        <p className="text-[11px] text-slate-600 leading-relaxed">
+                          支持导入之前导出的 JSON 配置文件，将按照上方设置的<strong className="text-slate-800 font-semibold">{importStrategy === 'merge' ? '增量合并' : '完全覆盖'}</strong>策略恢复数据。
+                        </p>
+                        <label className="w-full py-2.5 bg-white hover:bg-slate-100 text-slate-800 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-slate-300 shadow-2xs">
+                          <Upload size={14} /> 选择本地 JSON 文件还原 ({importStrategy === 'merge' ? '增量' : '覆盖'})
+                          <input
+                            type="file"
+                            accept=".json"
+                            onChange={handleJsonImport}
+                            className="hidden"
+                          />
+                        </label>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        支持导入之前导出的 JSON 配置文件，将按照上方设置的<strong className="text-slate-200 font-medium">{importStrategy === 'merge' ? '增量合并' : '完全覆盖'}</strong>策略恢复数据。
-                      </p>
-                      <label className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-white/15">
-                        <Upload size={14} /> 选择本地 JSON 文件还原 ({importStrategy === 'merge' ? '增量' : '覆盖'})
-                        <input
-                          type="file"
-                          accept=".json"
-                          onChange={handleJsonImport}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
 
-                    {/* HTML Bookmark Import */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-amber-400">
-                          <FileCode size={18} />
-                          <h5 className="text-xs font-bold text-white">从浏览器 HTML 书签导入</h5>
+                      {/* HTML Bookmark Import */}
+                      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-amber-600">
+                            <FileCode size={18} />
+                            <h5 className="text-xs font-bold text-slate-900">从浏览器 HTML 书签导入</h5>
+                          </div>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${
+                            importStrategy === 'merge' ? 'bg-blue-100 text-blue-800' : 'bg-rose-100 text-rose-800'
+                          }`}>
+                            {importStrategy === 'merge' ? '增量导入' : '覆盖导入'}
+                          </span>
                         </div>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                          importStrategy === 'merge' ? 'bg-blue-500/20 text-blue-300' : 'bg-rose-500/20 text-rose-300'
-                        }`}>
-                          {importStrategy === 'merge' ? '增量导入' : '覆盖导入'}
-                        </span>
+                        <p className="text-[11px] text-slate-600 leading-relaxed">
+                          支持 Chrome、Edge、Firefox 导出的 HTML 书签文件，将按<strong className="text-slate-800 font-semibold">{importStrategy === 'merge' ? '增量合并' : '完全覆盖'}</strong>模式导入书签与分类。
+                        </p>
+                        <label className="w-full py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-amber-300 shadow-2xs">
+                          <Bookmark size={14} /> 选择浏览器 HTML 书签文件 ({importStrategy === 'merge' ? '增量' : '覆盖'})
+                          <input
+                            type="file"
+                            accept=".html,.htm"
+                            onChange={handleHtmlImport}
+                            className="hidden"
+                          />
+                        </label>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        支持 Chrome、Edge、Firefox 导出的 HTML 书签文件，将按<strong className="text-slate-200 font-medium">{importStrategy === 'merge' ? '增量合并' : '完全覆盖'}</strong>模式导入书签与分类。
-                      </p>
-                      <label className="w-full py-2.5 bg-amber-600/30 hover:bg-amber-600/50 text-amber-100 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-amber-500/30">
-                        <Bookmark size={14} /> 选择浏览器 HTML 书签文件 ({importStrategy === 'merge' ? '增量' : '覆盖'})
-                        <input
-                          type="file"
-                          accept=".html,.htm"
-                          onChange={handleHtmlImport}
-                          className="hidden"
-                        />
-                      </label>
                     </div>
                   </div>
                 </div>
-              </div>
 
                 {/* Dangerous Operations Area */}
                 <div>
-                  <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2.5 px-1 flex items-center gap-1.5">
+                  <h4 className="text-xs font-bold text-rose-600 uppercase tracking-wider mb-2.5 px-1 flex items-center gap-1.5">
                     <ShieldAlert size={14} />
                     危险数据管理与重置 (带二次确认防护)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Clear All Bookmarks */}
-                    <div className="p-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 space-y-2.5">
+                    <div className="p-4 rounded-2xl border border-rose-200 bg-rose-50 space-y-2.5">
                       <div>
-                        <h5 className="text-xs font-bold text-rose-300">一键清空所有存储数据</h5>
-                        <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                        <h5 className="text-xs font-bold text-rose-900">一键清空所有存储数据</h5>
+                        <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                           清空所有自定义书签与分类分组，保留您的搜索引擎与主题外观配置。
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={handleTriggerClearBookmarks}
-                        className="w-full py-2 bg-rose-600/40 hover:bg-rose-600 text-rose-200 hover:text-white rounded-xl text-xs font-semibold transition-all border border-rose-500/40 flex items-center justify-center gap-1.5"
+                        className="w-full py-2 bg-white hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl text-xs font-semibold transition-all border border-rose-300 shadow-2xs flex items-center justify-center gap-1.5"
                       >
                         <Trash2 size={13} />
                         一键清空所有书签
@@ -2840,17 +2839,17 @@ export default {
                     </div>
 
                     {/* Restore Factory Defaults */}
-                    <div className="p-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 space-y-2.5">
+                    <div className="p-4 rounded-2xl border border-rose-200 bg-rose-50 space-y-2.5">
                       <div>
-                        <h5 className="text-xs font-bold text-rose-300">一键恢复出厂初始状态</h5>
-                        <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                        <h5 className="text-xs font-bold text-rose-900">一键恢复出厂初始状态</h5>
+                        <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                           彻底清除本地存储，重置为六零导航初始推荐书签、搜索引擎与默认主题。
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={handleTriggerRestoreFactory}
-                        className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold transition-all shadow-md shadow-rose-600/30 flex items-center justify-center gap-1.5"
+                        className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold transition-all shadow-sm flex items-center justify-center gap-1.5"
                       >
                         <RotateCcw size={13} />
                         一键恢复出厂值
@@ -2943,10 +2942,10 @@ function TabButton({
       onClick={onClick}
       className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 ${
         active
-          ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-1 ring-blue-400/50'
+          ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-1 ring-blue-500'
           : highlight
-          ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 border border-emerald-500/30'
-          : 'text-slate-300 hover:text-white hover:bg-white/10'
+          ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
       }`}
     >
       {icon}
@@ -2957,8 +2956,8 @@ function TabButton({
             active
               ? 'bg-white/20 text-white'
               : highlight
-              ? 'bg-emerald-400/20 text-emerald-200'
-              : 'bg-white/10 text-slate-300'
+              ? 'bg-emerald-100 text-emerald-800'
+              : 'bg-slate-100 text-slate-600 border border-slate-200'
           }`}
         >
           {badge}

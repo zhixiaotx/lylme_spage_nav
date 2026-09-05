@@ -145,7 +145,7 @@ export function WallpaperModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/75 backdrop-blur-md"
+        className="fixed inset-0 bg-black/60"
       />
 
       {/* Main Modal Box */}
@@ -156,13 +156,13 @@ export function WallpaperModal({
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className={`relative w-full max-w-5xl max-h-[90vh] flex flex-col rounded-3xl overflow-hidden shadow-2xl border z-10 ${
           isDarkMode
-            ? 'bg-slate-950/95 border-white/15 text-white'
-            : 'bg-white/95 border-slate-200/90 text-slate-900'
+            ? 'bg-slate-950 border-white/15 text-white'
+            : 'bg-white border-slate-200 text-slate-900'
         }`}
       >
         {/* Modal Header */}
         <div className={`px-6 py-4 flex items-center justify-between border-b ${
-          isDarkMode ? 'border-white/10 bg-slate-900/50' : 'border-slate-200/80 bg-slate-50/80'
+          isDarkMode ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-white'
         }`}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-400 flex items-center justify-center shadow-inner border border-sky-500/30">

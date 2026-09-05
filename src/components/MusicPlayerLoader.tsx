@@ -2,9 +2,26 @@ import React, { useEffect } from 'react';
 
 export const MusicPlayerLoader: React.FC = () => {
   useEffect(() => {
+    // Intercept third-party script cross-origin error spikes
+    const handleGlobalError = (event: ErrorEvent) => {
+      if (
+        event.message === 'Script error.' ||
+        event.filename?.includes('myhkw.cn') ||
+        event.filename?.includes('player')
+      ) {
+        // Prevent generic cross-origin third-party script error from bubbling up to dev overlay
+        event.preventDefault();
+        return true;
+      }
+    };
+
+    window.addEventListener('error', handleGlobalError);
+
     // Prevent duplicate load if already initialized or script present
     if (document.getElementById('myhk') || (window as any).myhkLoaded) {
-      return;
+      return () => {
+        window.removeEventListener('error', handleGlobalError);
+      };
     }
 
     try {
@@ -28,6 +45,10 @@ export const MusicPlayerLoader: React.FC = () => {
     // Function to load music player script
     const loadPlayer = () => {
       if (document.getElementById('myhk') || (window as any).myhkLoaded) return;
+      if (!(window as any).jQuery && !(window as any).$) {
+        console.warn('jQuery not available, skipping music player load to prevent errors.');
+        return;
+      }
       (window as any).myhkLoaded = true;
 
       const script = document.createElement('script');
@@ -44,19 +65,38 @@ export const MusicPlayerLoader: React.FC = () => {
       document.body.appendChild(script);
     };
 
-    // Check if jQuery is ready, otherwise poll briefly
-    if ((window as any).jQuery || (window as any).$) {
-      loadPlayer();
-    } else {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        if ((window as any).jQuery || (window as any).$ || attempts > 20) {
-          clearInterval(interval);
-          loadPlayer();
-        }
-      }, 100);
-    }
+    const ensureJQueryThenLoad = () => {
+      if ((window as any).jQuery || (window as any).$) {
+        setTimeout(loadPlayer, 300);
+        return;
+      }
+
+      // If not yet loaded, load jQuery dynamically
+      const jScript = document.createElement('script');
+      jScript.src = 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js';
+      jScript.onload = () => {
+        setTimeout(loadPlayer, 300);
+      };
+      jScript.onerror = () => {
+        // Try fallback CDN
+        const fallbackScript = document.createElement('script');
+        fallbackScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js';
+        fallbackScript.onload = () => {
+          setTimeout(loadPlayer, 300);
+        };
+        fallbackScript.onerror = () => {
+          console.warn('Failed to load jQuery for music player.');
+        };
+        document.head.appendChild(fallbackScript);
+      };
+      document.head.appendChild(jScript);
+    };
+
+    ensureJQueryThenLoad();
+
+    return () => {
+      window.removeEventListener('error', handleGlobalError);
+    };
   }, []);
 
   return null;
